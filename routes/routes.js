@@ -23,6 +23,7 @@ router.post('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZero
 router.post('/verficationApplication',isAuthenticated,applicationController.submitApplication);
 //admin
 router.post('/addCurrency',adminController.addCurrency);
+
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);
