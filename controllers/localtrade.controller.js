@@ -181,7 +181,7 @@ async profile(ctx){
         let details=null;
         let totalTrades= null;
         console.log("here");
-    await ctx.db.sequelize.query('select "traders"."id" as "traderId","traders"."name" as "traderName","coinsToTrades"."id","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."pricePerTokken","coinsToTrades"."supportedTokenId" , "verificationApplications"."status", \
+    await ctx.db.sequelize.query('select "traders"."id" as "traderId","traders"."name" as "traderName","coinsToTrades"."id" as "tradeId","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."pricePerTokken","coinsToTrades"."supportedTokenId" as "tokenId" , "verificationApplications"."status", \
     "supportedTokens"."name","supportedTokens"."symbol" \
     from "coinsToTrades" \
     full outer join "verificationApplications" on "verificationApplications"."traderId" = "coinsToTrades"."traderId" \
@@ -203,9 +203,10 @@ if (details){
     }}).spread((results, metadata) => {
         totalTrades=results;
         ctx.body= {traderProfile:{
-            name:details[0].name,
             traderId: details[0].traderid,
-            tokenId:details[0].id,
+            tokenId:details[0].tokenId,
+            tradeId:details[0].tradeId,
+            name:details[0].name,
             minQuantity:details[0].minQuantity,
             maxQuantity:details[0].maxQuantity,
             pricePerTokken:details[0].pricePerTokken,
