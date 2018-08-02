@@ -13,7 +13,7 @@ app.use(koaBody({ multipart: true }));
 app.use(bodyParser());
 app.use(router.routes());
 
-db.sequelize.sync({force:true}).
+db.sequelize.sync({force:false}).
 then(()=>console.log("table generated")).
 catch((err)=>console.log(err))
 
