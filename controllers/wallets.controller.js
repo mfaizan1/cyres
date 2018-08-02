@@ -77,7 +77,7 @@ async getAlljoin(ctx){
 
 },
 async hideZeroBalanceWallets(ctx){
-    await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\"")
+    await ctx.db.sequelize.query('select * from "supportedTokens" left OUTER JOIN "Wallets" ON "supportedTokens"."id" = "Wallets"."supportedTokenId" where  "Wallets"."balance" != 0')
       .spread((results, metadata) => {
           ctx.body=results;
       });

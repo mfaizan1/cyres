@@ -17,7 +17,7 @@ router.post('/changeLS',isAuthenticated,traderController.changeLocalSelling);
 router.get('/getWallets',isAuthenticated,walletsController.getAlljoin);
 router.post('/depositCrypto',isAuthenticated,walletsController.Deposit);
 router.post('/withdraw',isAuthenticated,walletsController.withdraw);
-router.post('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZeroBalanceWallets);
+router.get('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZeroBalanceWallets);
 //verification application
 
 router.post('/verficationApplication',isAuthenticated,applicationController.submitApplication);
