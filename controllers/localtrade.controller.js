@@ -181,7 +181,7 @@ async profile(ctx){
         let details=null;
         let totalTrades= null;
         console.log("here");
-    await ctx.db.sequelize.query('select "traders"."id" as "traderId","traders"."name" as "traderName","coinsToTrades"."id" as "tradeId","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."pricePerTokken","coinsToTrades"."supportedTokenId" as "tokenId", "coinsToTrade"."paymentMethod" , "verificationApplications"."status", \
+    await ctx.db.sequelize.query('select "traders"."id" as "traderId","traders"."name" as "traderName", "coinsToTrades"."id" as "tradeId","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."pricePerTokken","coinsToTrades"."supportedTokenId" as "tokenId", "coinsToTrades"."paymentMethod" , "verificationApplications"."status", \
     "supportedTokens"."name","supportedTokens"."symbol" \
     from "coinsToTrades" \
     full outer join "verificationApplications" on "verificationApplications"."traderId" = "coinsToTrades"."traderId" \
