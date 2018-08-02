@@ -1,0 +1,31 @@
+{
+  "name": "cyres",
+  "version": "1.0.0",
+  "description": "cyres node API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "run": "nodemon server.js"
+  },
+  "author": "faizan",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^2.2.2",
+    "bcrypt": "^2.0.1",
+    "jsonwebtoken": "^8.3.0",
+    "koa": "^2.5.1",
+    "koa-body": "^4.0.4",
+    "koa-multer": "^1.0.2",
+    "koa-parser": "^1.0.5",
+    "koa-router": "^7.4.0",
+    "koa2-cors": "^2.0.6",
+    "lodash": "^4.17.10",
+    "nodemon": "^1.17.5",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^4.37.10",
+    "sequelize-cli": "^4.0.0",
+    "speakeasy": "^2.0.0"
+  }
+}

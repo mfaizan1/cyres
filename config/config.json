@@ -1,0 +1,25 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "8pool",
+    "database": "cyres",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "secret":"eye123"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "8pool",
+    "database": "cyres",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "abxqrfyrinjnck",
+    "password": "f3226ef482a0e5ca1f21b8f2890a157f7e772ead22fb0a8a45ce8d747c572f4d",
+    "database": "dee0a3l8ik01ek",
+    "host": "ec2-50-19-86-139.compute-1.amazonaws.com",
+    "dialect": "postgres",
+    "port":"5432"
+  }
+}
