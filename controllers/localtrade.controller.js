@@ -152,8 +152,8 @@ ctx.body = {localTradeDelete:{
 async search(ctx)
 {
     await ctx.db.sequelize.query('SELECT \
-    "traders"."id" ,"traders"."name", "supportedTokens"."symbol", \
-    "coinsToTrades"."id","coinsToTrades"."traderId","coinsToTrades"."tradeType","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."paymentCurrency","coinsToTrades"."paymentMethod",\
+    "traders"."id" as "traderId" ,"traders"."name", "supportedTokens"."symbol", \
+    "coinsToTrades"."id" as "tradeId","coinsToTrades"."traderId" as "traderIdFromTradesTable","coinsToTrades"."tradeType","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."paymentCurrency","coinsToTrades"."paymentMethod","coinsToTrades"."supportedTokenId" as "tokkenId",\
     "verificationApplications"."country" \
     FROM "traders" \
     FULL OUTER JOIN "verificationApplications" ON "traders"."id" = "verificationApplications"."traderId" \
