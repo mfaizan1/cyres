@@ -203,10 +203,10 @@ if (details){
     }}).spread((results, metadata) => {
         totalTrades=results;
         ctx.body= {traderProfile:{
-            traderId: details[0].traderid,
+            traderId: details[0].traderId,
             tokenId:details[0].tokenId,
             tradeId:details[0].tradeId,
-            traderName:details.traderName,
+            traderName:details[0].traderName,
             coinName:details[0].name,
             minQuantity:details[0].minQuantity,
             maxQuantity:details[0].maxQuantity,
