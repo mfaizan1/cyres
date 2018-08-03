@@ -68,15 +68,17 @@ ctx.body={
 
 },
 async getAlljoin(ctx){
-    
-  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" where traderId = :traderId",{replacements:{
+    try{
+  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" where \"traderId\" = :traderId" ,{replacements:{
       traderId:ctx.state.trader
   }})
     .spread((results, metadata) => {
         ctx.body=results;
     });
       
-
+    }catch(err){
+        console.log(err);
+    }
 },
 async hideZeroBalanceWallets(ctx){
     await ctx.db.sequelize.query('select * from "supportedTokens" left OUTER JOIN "Wallets" ON "supportedTokens"."id" = "Wallets"."supportedTokenId" where  "Wallets"."balance" != 0')
