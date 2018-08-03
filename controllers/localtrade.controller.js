@@ -229,6 +229,39 @@ if (details){
     }catch(err){
         console.log(err);
     }
+},
+async initiateTrade(ctx){
+
+    try{
+
+        return sequelize.transaction(function (t) {
+
+            // chain all your queries here. make sure you return them.
+            return ctx.db.escrow.create({
+              quantitiy: ctx.request.body.quantitiy,
+                traderId: ctx.request.body.traderId,
+                heldById: ctx.request.body.clientId,
+            }, {transaction: t}).then(function (user) {
+              return ctx.db.Wallets.update({
+                firstName: 'John',
+                lastName: 'Boothe'
+              }, {transaction: t});
+            });
+          
+          }).then(function (result) {
+            // Transaction has been committed
+            // result is whatever the result of the promise chain returned to the transaction callback
+          }).catch(function (err) {
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+          });
+
+
+
+    }catch(err){
+
+    }
+
 }
 
 

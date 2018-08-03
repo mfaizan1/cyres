@@ -20,6 +20,9 @@ router.post('/withdraw',isAuthenticated,walletsController.withdraw);
 router.get('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZeroBalanceWallets);
 //verification application
 
+
+
+
 router.post('/verficationApplication',isAuthenticated,applicationController.submitApplication);
 //admin
 router.post('/addCurrency',adminController.addCurrency);

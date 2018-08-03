@@ -69,7 +69,9 @@ ctx.body={
 },
 async getAlljoin(ctx){
     
-  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\"")
+  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" where traderId = :traderId",{replacements:{
+      traderId:ctx.state.trader
+  }})
     .spread((results, metadata) => {
         ctx.body=results;
     });
