@@ -1,17 +1,5 @@
 module.exports={
-async getAll(ctx){
-try {
-
-    ctx.body =await ctx.db.supportedTokens.findAll({
-        attributes:[
-            'name','symbol']
-    });
-}catch(err){
-    console.log(500,"Generic error : "+ err);
-}
-},
 async Deposit(ctx){
-
 try{
     const symbol= ctx.request.body.symbol;
     const coin = await ctx.db.supportedTokens.findOne({
@@ -46,7 +34,7 @@ ctx.body={
     }else if (coin.id===2){
         ctx.body = await ctx.db.Wallets.create({
             address:"eos123asdknmnk123kanm",
-            balance:1000,
+            balance:0,
             supportedTokenId:coin.id,
             traderId:ctx.state.trader
         });
@@ -69,9 +57,10 @@ ctx.body={
 },
 async getAlljoin(ctx){
     try{
-  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" where \"traderId\" = :traderId" ,{replacements:{
-      traderId:ctx.state.trader
-  }})
+        // where \"traderId\" = :traderId" ,{replacements:{
+        //     traderId:ctx.state.trader
+        // }}
+  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" ")
     .spread((results, metadata) => {
         ctx.body=results;
     });
