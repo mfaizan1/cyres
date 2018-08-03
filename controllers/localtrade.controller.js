@@ -1,6 +1,6 @@
 const UtilServices =  require('./../utils/util.service');
 const JwtServices = require('./../utils/jwt.service');
-
+const Sequelize = require('sequelize');
 module.exports={
 async myLocalTrades(ctx){
     try{
@@ -234,24 +234,28 @@ async initiateTrade(ctx){
 
     try{
 
-        return sequelize.transaction(function (t) {
+        // await ctx.db.Wallets.findOne
 
+        return ctx.db.sequelize.transaction(function (t) {
+            console.log("here");
             // chain all your queries here. make sure you return them.
             return ctx.db.escrow.create({
-              quantitiy: ctx.request.body.quantitiy,
+              quantity: ctx.request.body.quantity,
                 traderId: ctx.request.body.traderId,
-                heldById: ctx.request.body.clientId,
-            }, {transaction: t}).then(function (user) {
+                heldById: ctx.state.trader,
+            }, {transaction: t}).then(function (escrow) {
               return ctx.db.Wallets.update({
-                firstName: 'John',
-                lastName: 'Boothe'
-              }, {transaction: t});
+                field: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
+              },{where:{
+                  traderId:ctx.request.body.traderId
+              }}, {transaction: t});
             });
-          
           }).then(function (result) {
+              console.log(result);
             // Transaction has been committed
             // result is whatever the result of the promise chain returned to the transaction callback
           }).catch(function (err) {
+              console.log(err);
             // Transaction has been rolled back
             // err is whatever rejected the promise chain returned to the transaction callback
           });

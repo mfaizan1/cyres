@@ -33,6 +33,7 @@ router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocal
 router.post('/localtrade/search',isAuthenticated,localTradeController.search);
 router.get('/localtrade/myListings',isAuthenticated,localTradeController.myLocalTrades);
 router.post('/localtrade/traderprofile',isAuthenticated,localTradeController.profile);
+router.post('/localtrade/initiatetrade',isAuthenticated,localTradeController.initiateTrade);
 
 
 

@@ -46,7 +46,7 @@ ctx.body={
     }else if (coin.id===2){
         ctx.body = await ctx.db.Wallets.create({
             address:"eos123asdknmnk123kanm",
-            balance:0,
+            balance:1000,
             supportedTokenId:coin.id,
             traderId:ctx.state.trader
         });
