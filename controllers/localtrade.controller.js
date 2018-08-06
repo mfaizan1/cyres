@@ -10,12 +10,16 @@ async myLocalTrades(ctx){
     }
 });
     }catch(err){
-
+        ctx.body={failed:{
+            status:0,
+            message: "something went wrong at serverside"
+        }}
+        console.log(err);
     }
 
 },
 async addLocalTrade(ctx){
-
+try{
         const coin=  await ctx.db.supportedTokens.findOne({
         where :{
             symbol:ctx.request.body.symbol
@@ -68,7 +72,24 @@ console.log(typeof(ctx.request.body.maxQuantity));
                     message:"Minimum qunaitity cannot be less than 0"
                 }
           }
-        }else {
+          
+        } else if (parseFloat(ctx.request.body.minQuantity)>parseFloat(ctx.request.body.maxQuantity)){
+            return  ctx.body =     {
+                addcoin:{
+                    status:0,
+                    message:"Maximum qunaitity cannot be less than minimum qunatity"
+                }
+          }
+        }
+        else if (parseFloat(ctx.request.body.maxQuantity)<0 || parseFloat(ctx.request.body.maxQuantity)<0 ){
+            return  ctx.body =     {
+                addcoin:{
+                    status:0,
+                    message:"Maximum qunaitity cannot 0 or less than 0"
+                }
+          }
+        }
+          else {
       const tradeDetails =    await ctx.db.coinsToTrade.create({
                 minQuantity:ctx.request.body.minQuantity,
                 maxQuantity:ctx.request.body.maxQuantity,
@@ -122,7 +143,13 @@ console.log(typeof(ctx.request.body.maxQuantity));
             }
     }
 }
-
+}catch(err){
+    ctx.body={failed:{
+        status:0,
+        message: "something went wrong at serverside"
+    }}
+    console.log(err);
+}
 
 },
 async deleteLocalTrade(ctx){
@@ -145,12 +172,17 @@ ctx.body = {localTradeDelete:{
 } }
     }
 }catch (err){
-        ctx.throw(err);
+    ctx.body={failed:{
+        status:0,
+        message: "something went wrong at serverside"
+    }}
+    console.log(err);
     }
       
 },
 async search(ctx)
 {
+    try{
     await ctx.db.sequelize.query('SELECT \
     "traders"."id" as "traderId" ,"traders"."name", "supportedTokens"."symbol", \
     "coinsToTrades"."id" as "tradeId","coinsToTrades"."traderId" as "traderIdFromTradesTable","coinsToTrades"."tradeType","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."paymentCurrency","coinsToTrades"."paymentMethod","coinsToTrades"."supportedTokenId" as "tokkenId",\
@@ -175,6 +207,13 @@ async search(ctx)
       console.log(results);
     ctx.body=results;
 });
+}catch(err){
+    ctx.body={failed:{
+        status:0,
+        message: "something went wrong at serverside"
+    }}
+    console.log(err);
+}
 },
 async profile(ctx){
     try{
@@ -227,6 +266,10 @@ if (details){
 // });
 }
     }catch(err){
+        ctx.body={failed:{
+            status:0,
+            message: "something went wrong at serverside"
+        }}
         console.log(err);
     }
 },
@@ -234,28 +277,47 @@ async initiateTrade(ctx){
 
     try{
 
-        // await ctx.db.Wallets.findOne
-
         return ctx.db.sequelize.transaction(function (t) {
             console.log("here");
             // chain all your queries here. make sure you return them.
-            return ctx.db.escrow.create({
-              quantity: ctx.request.body.quantity,
-                traderId: ctx.request.body.traderId,
-                heldById: ctx.state.trader,
-            }, {transaction: t}).then(function (escrow) {
+            return ctx.db.localTrade.create({
+                quantity: ctx.request.body.quantity,
+                  traderId: ctx.request.body.traderId,
+                  status:'Active',
+                  clientId: ctx.state.trader,
+                  feedbackGiven:false,
+                  supportedTokenId: ctx.request.body.tokenId
+              }, {transaction: t}).then(function (localTrade) {
+                return ctx.db.escrow.create({
+                    quantity: ctx.request.body.quantity,
+                      traderId: ctx.request.body.traderId,
+                      heldById: ctx.state.trader,
+                      supportedTokenId: ctx.request.body.tokenId,
+                      localTradeId:localTrade.id
+                  }, {transaction: t})
+              }).then(function (escrow) {
               return ctx.db.Wallets.update({
-                field: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
+                balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
               },{where:{
                   traderId:ctx.request.body.traderId
               }}, {transaction: t});
             });
-          }).then(function (result) {
-              console.log(result);
+          }).then(function (Wallets) {
+              console.log(Wallets);
+            ctx.body= { buy:{
+                status:1,
+                message:"Buy request sent"
+            }
+        }
             // Transaction has been committed
             // result is whatever the result of the promise chain returned to the transaction callback
           }).catch(function (err) {
               console.log(err);
+              ctx.body= { buy:{
+                status:0,
+                message:"Something gone wrong"
+            }
+        }
             // Transaction has been rolled back
             // err is whatever rejected the promise chain returned to the transaction callback
           });
@@ -263,10 +325,175 @@ async initiateTrade(ctx){
 
 
     }catch(err){
+        ctx.body= { 
+            buy:{
+            status:0,
+            message:"Something gone wrong"}
+    }
+    }
+
+},
+async myLocalTrades(ctx){
+    try{
+        await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
+        join "traders" on "localTrades"."traderId" = "traders"."id" \
+        join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
+        where "localTrades"."clientId" = :traderId',{replacements:{
+        traderId:ctx.state.trader,
+        }}).spread((results, metadata) => {
+            ctx.body= results;
+      });
+    }catch(err){
+
+    }
+},
+async localTrade(ctx){
+    try{
+        await ctx.db.sequelize.query();
+        await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
+        join "traders" on "localTrades"."traderId" = "traders"."id" \
+        join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
+        where "localTrades"."id" = :tradeId',{replacements:{
+        tradeId:ctx.request.body.tradeId,
+        }}).spread((results, metadata) => {
+            ctx.body= results;
+      });
+    }catch(err){
 
     }
 
+
+},
+async cancelTrade(ctx){
+
+    try{
+        console.log("wtf "+ctx.request.body);
+        return ctx.db.sequelize.transaction(function (t) {
+            // chain all your queries here. make sure you return them.
+            return ctx.db.localTrade.update({
+                  status:'Cancelled'
+              },{where:{
+                id:ctx.request.body.localTradeId
+            }}, {transaction: t}).then(function (localTrade) {
+                console.log(localTrade);
+                return ctx.db.escrow.findOne({where:{
+                    localTradeId:ctx.request.body.localTradeId
+                  }}, {transaction: t})
+              }).then(function (escrow) {
+                  console.log(escrow);
+              return ctx.db.Wallets.update({
+                balance: Sequelize.literal(`balance + ${escrow.quantity}`)
+              },{where:{
+                  traderId:escrow.traderId
+              }}, {transaction: t});
+            }).then(function (escrow) {
+                console.log(escrow);
+                return ctx.db.escrow.destroy({where:{
+                    localTradeId:ctx.request.body.localTradeId
+                  }}, {transaction: t})
+              });
+          }).then(function (Wallets) {
+              console.log(Wallets);
+            ctx.body= { buyCancel:{
+                status:1,
+                message:"Buy request cancelled"
+            }
+        }
+
+            // Transaction has been committed
+            // result is whatever the result of the promise chain returned to the transaction callback
+          }).catch(function (err) {
+              console.log(err);
+              ctx.body= { buyCancel:{
+                status:0,
+                message:"Something gone wrong"
+            }
+        }
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+          });
+
+
+
+    }catch(err){
+        ctx.body= { 
+            buy:{
+            status:0,
+            message:"Something gone wrong"}
+    }
+    }
+
 }
+,async completeTrade(ctx){
+
+
+
+    try{
+        return ctx.db.sequelize.transaction(function (t) {
+            console.log("here");
+            // chain all your queries here. make sure you return them.
+            return ctx.db.localTrade.update({
+                  status:'Completed'
+              },{where:{
+                id:ctx.request.body.localTradeId,
+                traderId:ctx.state.trader
+            }}, {transaction: t}).then(function (localTrade) {
+                if(localTrade[0] === 1){
+                    console.log(escrow +"  OPOPOP "+localTrade);
+                    return ctx.db.escrow.findOne({
+                      },{where:{
+                        localTradeId:ctx.request.body.localTradeId,
+                        traderId:ctx.state.trader
+                      }}, {transaction: t})
+                }else {
+                    return;
+                }
+             
+              }).then(function (escrow) {
+              return ctx.db.Wallets.update({
+                field: Sequelize.literal(`balance + ${ctx.request.body.quantity}`)
+              },{where:{
+                  traderId:escrow.heldById
+              }}, {transaction: t});
+            }).then(function (localTrade) {
+                return ctx.db.escrow.destroy({
+                  },{where:{
+                    localTradeId:ctx.request.body.localTradeId
+                  }}, {transaction: t})
+              });
+          }).then(function (Wallets) {
+              console.log(Wallets);
+            ctx.body= { order:{
+                status:1,
+                message:"Order Completed"
+            }
+        }
+            // Transaction has been committed
+            // result is whatever the result of the promise chain returned to the transaction callback
+          }).catch(function (err) {
+              console.log(err);
+              ctx.body= { buy:{
+                status:0,
+                message:"Something gone wrong"
+            }
+        }
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+          });
+
+
+
+    }catch(err){
+        ctx.body= { 
+            buy:{
+            status:0,
+            message:"Something gone wrong"}
+    }
+    }
+
+
+
+    }
 
 
 

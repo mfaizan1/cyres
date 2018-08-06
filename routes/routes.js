@@ -34,7 +34,8 @@ router.post('/localtrade/search',isAuthenticated,localTradeController.search);
 router.get('/localtrade/myListings',isAuthenticated,localTradeController.myLocalTrades);
 router.post('/localtrade/traderprofile',isAuthenticated,localTradeController.profile);
 router.post('/localtrade/initiatetrade',isAuthenticated,localTradeController.initiateTrade);
-
-
-
+router.post('/localtrade/myLocalTrades',isAuthenticated,localTradeController.myLocalTrades);
+router.post('/localtrade/localTrade',isAuthenticated,localTradeController.localTrade);
+router.post('/localtrade/cancelTrade',isAuthenticated,localTradeController.cancelTrade);
+router.post('/localtrade/completeTrade',isAuthenticated,localTradeController.completeTrade);
 module.exports = router;

@@ -11,7 +11,8 @@ supportedTokens.associate = (models)=>{
     through:'Wallets'
   });
   supportedTokens.hasMany(models.coinsToTrade);
-  
+  supportedTokens.hasMany(models.localTrade);
+  supportedTokens.hasMany(models.escrow);
 };
 
   return supportedTokens;

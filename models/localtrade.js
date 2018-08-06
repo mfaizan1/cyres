@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   localTrade.associate = function(models) {
-    // associations can be defined here
+  localTrade.hasMany(models.escrow);
   };
   return localTrade;
 };
