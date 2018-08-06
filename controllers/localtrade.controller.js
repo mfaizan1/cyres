@@ -8,9 +8,10 @@ async myLocalTrades(ctx){
         where:{
         traderId:ctx.state.trader
     }
+    
 });
     }catch(err){
-        ctx.body={failed:{
+        ctx.body={localtrades:{
             status:0,
             message: "something went wrong at serverside"
         }}
@@ -145,7 +146,7 @@ console.log(typeof(ctx.request.body.maxQuantity));
     }
 }
 }catch(err){
-    ctx.body={failed:{
+    ctx.body={localtrade:{
         status:0,
         message: "something went wrong at serverside"
     }}
@@ -173,7 +174,7 @@ ctx.body = {localTradeDelete:{
 } }
     }
 }catch (err){
-    ctx.body={failed:{
+    ctx.body={localTradeDelete:{
         status:0,
         message: "something went wrong at serverside"
     }}
@@ -209,7 +210,7 @@ async search(ctx)
     ctx.body=results;
 });
 }catch(err){
-    ctx.body={failed:{
+    ctx.body={search:{
         status:0,
         message: "something went wrong at serverside"
     }}
@@ -267,7 +268,7 @@ if (details){
 // });
 }
     }catch(err){
-        ctx.body={failed:{
+        ctx.body={traderProfile:{
             status:0,
             message: "something went wrong at serverside"
         }}
