@@ -102,7 +102,7 @@ console.log(typeof(ctx.request.body.maxQuantity));
                 supportedTokenId:coin.id
             });
             ctx.body = {
-                localtrade:{
+                addcoin:{
                     status:1,
                     message:"New trade detail added",
                     coinName :coin.name,
