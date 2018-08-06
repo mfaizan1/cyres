@@ -336,7 +336,7 @@ async initiateTrade(ctx){
     }
 
 },
-async myLocalTrades(ctx){
+async myLocalActiveTrades(ctx){
     try{
         await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
         join "traders" on "localTrades"."traderId" = "traders"."id" \
