@@ -91,7 +91,7 @@ ctx.body = {verificationApplication:{
 }catch(err){
 ctx.body = {verificationApplication:{
     status:0,
-    message:"some painyaki happend please try again"
+    message:"some problem happend please try again"
 }}
 }
 
