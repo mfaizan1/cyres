@@ -338,7 +338,7 @@ async myLocalTrades(ctx){
         await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
         join "traders" on "localTrades"."traderId" = "traders"."id" \
         join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
-        where "localTrades"."clientId" = :traderId',{replacements:{
+        where "localTrades"."clientId" = :traderId OR "localTrades"."traderId" = :traderId' ,{replacements:{
         traderId:ctx.state.trader,
         }}).spread((results, metadata) => {
             ctx.body= results;
@@ -377,7 +377,8 @@ async cancelTrade(ctx){
             }}, {transaction: t}).then(function (localTrade) {
                 console.log(localTrade);
                 return ctx.db.escrow.findOne({where:{
-                    localTradeId:ctx.request.body.localTradeId
+                    localTradeId:ctx.request.body.localTradeId,
+                    heldById:ctx.state.trader
                   }}, {transaction: t})
               }).then(function (escrow) {
                   console.log(escrow);
@@ -389,7 +390,8 @@ async cancelTrade(ctx){
             }).then(function (escrow) {
                 console.log(escrow);
                 return ctx.db.escrow.destroy({where:{
-                    localTradeId:ctx.request.body.localTradeId
+                    localTradeId:ctx.request.body.localTradeId,
+                    clientId:ctx.state.trader
                   }}, {transaction: t})
               });
           }).then(function (Wallets) {
@@ -417,7 +419,7 @@ async cancelTrade(ctx){
 
     }catch(err){
         ctx.body= { 
-            buy:{
+            buyCancel:{
             status:0,
             message:"Something gone wrong"}
     }
@@ -458,7 +460,8 @@ async cancelTrade(ctx){
             }).then(function (localTrade) {
                 return ctx.db.escrow.destroy({
                   },{where:{
-                    localTradeId:ctx.request.body.localTradeId
+                    localTradeId:ctx.request.body.localTradeId,
+                    traderId:ctx.state.trader
                   }}, {transaction: t})
               });
           }).then(function (Wallets) {
@@ -472,7 +475,7 @@ async cancelTrade(ctx){
             // result is whatever the result of the promise chain returned to the transaction callback
           }).catch(function (err) {
               console.log(err);
-              ctx.body= { buy:{
+              ctx.body= { order:{
                 status:0,
                 message:"Something gone wrong"
             }
@@ -485,7 +488,7 @@ async cancelTrade(ctx){
 
     }catch(err){
         ctx.body= { 
-            buy:{
+            order:{
             status:0,
             message:"Something gone wrong"}
     }
