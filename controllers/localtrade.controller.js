@@ -21,7 +21,7 @@ async myLocalTrades(ctx){
 async addLocalTrade(ctx){
 try{
     console.log(ctx.request.body);
-        const coin=  await ctx.db.supportedTokens.findOne({
+        const coin= await ctx.db.supportedTokens.findOne({
         where :{
             symbol:ctx.request.body.symbol
         }
