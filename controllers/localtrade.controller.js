@@ -8,7 +8,7 @@ async myLocalTrades(ctx){
         where:{
         traderId:ctx.state.trader
     }
-    
+
 });
     }catch(err){
         ctx.body={localtrades:{
@@ -146,9 +146,10 @@ console.log(typeof(ctx.request.body.maxQuantity));
     }
 }
 }catch(err){
-    ctx.body={localtrade:{
+    ctx.body={addcoin:{
         status:0,
-        message: "something went wrong at serverside"
+        message: "something went wrong at serverside",
+        err
     }}
     console.log(err);
 }
