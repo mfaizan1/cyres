@@ -9,7 +9,7 @@ const PORT = process.env.PORT||8000;
 
 const app = new koa();
 app.use(cors());
-app.use(koaBody({ multipart: false}));
+app.use(koaBody({ multipart: true}));
 app.use(bodyParser());
 app.use(router.routes());
 
