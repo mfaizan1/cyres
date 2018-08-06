@@ -493,10 +493,30 @@ async cancelTrade(ctx){
             message:"Something gone wrong"}
     }
     }
+},
+async feedback(ctx){
+    try{
+            const localTrade =  await ctx.db.localtrade.findOne({
+                where:{
+                    id:ctx.request.tradeId
+                }
+            });
+
+            if(localTrade.feedbackGiven){
+                return ctx.body = {
+                    feedback:{
+                        status:0,
+                        message: "you have already given feedback on this trade"
+                    }
+                }
+            }
 
 
-
+    }catch(err){
+        console.log();
     }
+
+}
 
 
 

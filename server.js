@@ -13,12 +13,9 @@ app.use(koaBody({ multipart: true }));
 app.use(bodyParser());
 app.use(router.routes());
 
-db.sequelize.sync({force:false}).
+db.sequelize.sync({force:true}).
 then(()=>console.log("table generated")).
 catch((err)=>console.log(err))
-
-
-
 app.context.db=db;
 app.listen(PORT);
 console.log(`server started on port ${PORT}`);

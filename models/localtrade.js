@@ -29,6 +29,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   localTrade.associate = function(models) {
   localTrade.hasMany(models.escrow);
+  localTrade.hasOne(models.feedback);
+  
   };
   return localTrade;
 };
