@@ -353,13 +353,24 @@ async myLocalActiveTrades(ctx){
 async localTrade(ctx){
     try{
         await ctx.db.sequelize.query();
-        await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
+        await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","localTrades"."clientId","localTrades"."traderId", \
+		"traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades"  \
         join "traders" on "localTrades"."traderId" = "traders"."id" \
         join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
         where "localTrades"."id" = :tradeId',{replacements:{
         tradeId:ctx.request.body.tradeId,
         }}).spread((results, metadata) => {
-            ctx.body= results;
+            if (ctx.state.trader==results.clientId){
+                results.role= "client"
+
+            }
+            else if(ctx.state.trader==results.traderId){
+                results.role= "trader"
+            }
+            else {
+                results.role= "what"
+            }
+            ctx.body = results;
       });
     }catch(err){
 

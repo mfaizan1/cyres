@@ -13,6 +13,7 @@ router.post('/changePassword',isAuthenticated,traderController.editPassword);
 router.post('/disableAccount',isAuthenticated,traderController.disableAccount);
 router.post('/deleteAccount',isAuthenticated,traderController.deleteAccount);
 router.post('/changeLS',isAuthenticated,traderController.changeLocalSelling);
+router.post('/getSecretKey',isAuthenticated,traderController.getSecretKey);
 //wallets
 router.get('/getWallets',isAuthenticated,walletsController.getAlljoin);
 router.post('/depositCrypto',isAuthenticated,walletsController.Deposit);

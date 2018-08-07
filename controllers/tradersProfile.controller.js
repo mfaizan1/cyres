@@ -1,5 +1,6 @@
 const UtilServices =  require('./../utils/util.service');
 const JwtServices = require('./../utils/jwt.service');
+const speakeasy =  require('./../2FA/2FA');
 module.exports ={
 async signup(ctx){
 
@@ -243,8 +244,8 @@ async editPassword(ctx){
 async forgetPassword(ctx){
     ctx.body = "forget password";
 },
-async enable2FA(ctx){
-    ctx.body = "enable 2fa";
+async getSecretKey(ctx){
+ console.log(speakeasy.secretkey);
 },
 async disable2FA(ctx){
     ctx.body = "disable 2fa";
