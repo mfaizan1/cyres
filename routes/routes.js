@@ -38,4 +38,6 @@ router.get('/localtrade/myLocalTrades',isAuthenticated,localTradeController.myLo
 router.post('/localtrade/localTrade',isAuthenticated,localTradeController.localTrade);
 router.post('/localtrade/cancelTrade',isAuthenticated,localTradeController.cancelTrade);
 router.post('/localtrade/completeTrade',isAuthenticated,localTradeController.completeTrade);
+router.post('/localtrade/feedback',isAuthenticated,localTradeController.feedback);
+
 module.exports = router;

@@ -404,7 +404,6 @@ async cancelTrade(ctx){
                 message:"Buy request cancelled"
             }
         }
-
             // Transaction has been committed
             // result is whatever the result of the promise chain returned to the transaction callback
           }).catch(function (err) {
@@ -443,17 +442,13 @@ async cancelTrade(ctx){
                 id:ctx.request.body.localTradeId,
                 traderId:ctx.state.trader
             }}, {transaction: t}).then(function (localTrade) {
-                if(localTrade[0] === 1){
-                    console.log(escrow +"  OPOPOP "+localTrade);
+        
                     return ctx.db.escrow.findOne({
                       },{where:{
                         localTradeId:ctx.request.body.localTradeId,
                         traderId:ctx.state.trader
                       }}, {transaction: t})
-                }else {
-                    return;
-                }
-             
+                
               }).then(function (escrow) {
               return ctx.db.Wallets.update({
                 field: Sequelize.literal(`balance + ${ctx.request.body.quantity}`)
@@ -461,8 +456,7 @@ async cancelTrade(ctx){
                   traderId:escrow.heldById
               }}, {transaction: t});
             }).then(function (localTrade) {
-                return ctx.db.escrow.destroy({
-                  },{where:{
+                return ctx.db.escrow.destroy({where:{
                     localTradeId:ctx.request.body.localTradeId,
                     traderId:ctx.state.trader
                   }}, {transaction: t})
@@ -499,13 +493,15 @@ async cancelTrade(ctx){
 },
 async feedback(ctx){
     try{
-            const localTrade =  await ctx.db.localtrade.findOne({
+        console.log("here");
+            const localTrade =  await ctx.db.localTrade.findOne({
                 where:{
-                    id:ctx.request.tradeId
+                    id:ctx.request.body.localTradeId
                 }
             });
-
-            if(!localTrade)
+            console.log(localTrade);
+            console.log("here");
+            if(localTrade ===null)
             {
                return ctx.body={
                     feedback:{
@@ -514,7 +510,7 @@ async feedback(ctx){
                     }
                 }
             }
-            if(localTrade.feedbackGiven){
+          else if(localTrade.feedbackGiven){
                 return ctx.body = {
                     feedback:{
                         status:0,
@@ -533,19 +529,43 @@ async feedback(ctx){
                     
             }
             else {
-                ctx.body =  await ctx.db.feedback.create({
-                    rating: ctx.request.body.rating,
-                    comment:ctx.request.body.comment,
-                    feedbackClientId:ctx.state.trader,
-                    traderId:localTrade.traderId
-                     
-                })
+                return ctx.db.sequelize.transaction(function (t) {
+                    return ctx.db.localTrade.update({
+                        feedbackGiven:'true'
+                    },{where:{
+                      id:ctx.request.body.localTradeId,
+                      clientId:ctx.state.trader
+                  }}, {transaction: t}).then(function(){
+
+                    return ctx.db.feedback.create({
+                        rating: ctx.request.body.rating,
+                        comment:ctx.request.body.comment,
+                        localTradeId:ctx.request.body.localTradeId,
+                        feedbackClientId:ctx.state.trader,
+                        traderId:localTrade.traderId
+                         
+                    })
+                  }).then(function(feedback){
+
+                      ctx.body=feedback;
+                  }).catch(function(err){
+                    ctx.body={
+                        feedback:{
+                        status:0,
+                        message:"something went wrong on server side"
+                        }
+                    }
+                  });
+
+
+                });
+             
                     
             }
 
 
     }catch(err){
-        console.log();
+        console.log(err);
     }
 
 }
