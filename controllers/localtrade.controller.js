@@ -394,7 +394,7 @@ async cancelTrade(ctx){
                 console.log(escrow);
                 return ctx.db.escrow.destroy({where:{
                     localTradeId:ctx.request.body.localTradeId,
-                    clientId:ctx.state.trader
+                    heldById:ctx.state.trader
                   }}, {transaction: t})
               });
           }).then(function (Wallets) {
