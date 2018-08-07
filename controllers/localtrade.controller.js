@@ -505,6 +505,15 @@ async feedback(ctx){
                 }
             });
 
+            if(!localTrade)
+            {
+               return ctx.body={
+                    feedback:{
+                        status:0,
+                        message: "unable to find local trade."
+                    }
+                }
+            }
             if(localTrade.feedbackGiven){
                 return ctx.body = {
                     feedback:{
@@ -512,6 +521,26 @@ async feedback(ctx){
                         message: "you have already given feedback on this trade"
                     }
                 }
+              
+            }
+            else if(localTrade.status !== "Completed") {
+                return ctx.body = {
+                    feedback:{
+                        status:0,
+                        message: "you cannot give feedback on uncompleted trade"
+                    }
+                }
+                    
+            }
+            else {
+                ctx.body =  await ctx.db.feedback.create({
+                    rating: ctx.request.body.rating,
+                    comment:ctx.request.body.comment,
+                    feedbackClientId:ctx.state.trader,
+                    traderId:localTrade.traderId
+                     
+                })
+                    
             }
 
 
