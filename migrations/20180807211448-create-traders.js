@@ -23,14 +23,20 @@ module.exports = {
       accountActive: {
         type: Sequelize.BOOLEAN
       },
+      twoFAActive: {
+        type: Sequelize.BOOLEAN
+      },
+      secretKey: {
+        type: Sequelize.STRING
+      },
       accountDelete: {
         type: Sequelize.BOOLEAN
       },
       localTradeActive: {
         type: Sequelize.BOOLEAN
       },
-      google2FAActive: {
-        type: Sequelize.BOOLEAN
+      phoneNumber: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

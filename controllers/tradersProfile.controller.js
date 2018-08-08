@@ -1,6 +1,6 @@
 const UtilServices =  require('./../utils/util.service');
 const JwtServices = require('./../utils/jwt.service');
-const speakeasy =  require('./../2FA/2FA');
+const twoFa =  require('./../2FA/twoFa');
 module.exports ={
 async signup(ctx){
 
@@ -93,8 +93,10 @@ async login(ctx){
             }
     };
           }
-   
-       
+          if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
+
+    if(twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)){
+
         const matched=await UtilServices.comparePassword(password,trader.password);
         if(matched){
 console.log(trader.accountDelete);
@@ -141,6 +143,26 @@ else {
                     messsage:"password incorrect"
                 }};
         }
+    }else{
+        return  ctx.body=  {signin:{
+            status:0,
+            message:"Two factor code mismatch please enter correct code"
+        }
+};
+    }
+       
+
+        }
+        else{
+
+            return  ctx.body=  {signin:{
+                status:2,
+                message:"redirect to 2FA entering page"
+            }
+          }
+        }
+        
+   
         }
     catch(err){
     ctx.throw(500,err);
@@ -242,16 +264,107 @@ async editPassword(ctx){
       }
 },
 async forgetPassword(ctx){
+    
     ctx.body = "forget password";
 },
-async getSecretKey(ctx){
- console.log(speakeasy.secretkey);
+getSecretKey(ctx){
+    ctx.body={ getSecretKey:{
+       secretkey: twoFa.getSecretKey(),
+       status:1,
+       message:"here is your secret key"
+    } 
+    }
+
+},
+async enable2FA(ctx){
+    try{
+     const verified =   twoFa.verifySecretKey(ctx.request.body.secretkey,ctx.request.body.token);
+     console.log(verified);
+     if(verified){
+     await ctx.db.traders.update({
+         twoFAActive:true,
+         secretKey:ctx.request.body.secretkey
+     },{where:{
+         id:ctx.state.trader
+     }})
+     ctx.body={enable2FA:{
+        satus:1,
+        message:"2FA enabled"
+    }
+ }
+    }
+     else{
+        ctx.body={enable2FA:{
+            satus:0,
+            message:"Code mismatch, please enter correct code"
+        }
+     }
+    }
+}
+    catch(err){
+        console.log(err);
+        ctx.body={enable2FA:{
+            satus:0,
+            message:"please retry"
+        }
+
+        }
+    }
+
 },
 async disable2FA(ctx){
-    ctx.body = "disable 2fa";
+    try{
+
+        const trader  = await ctx.db.traders.findOne({
+            where :{
+                id : ctx.state.trader
+            }
+        });
+        if(trader === null ){
+            return ctx.body = { disable2FA:{
+                status:0,
+                message:"no such User"
+            }
+
+            }
+        }
+        const verified =   twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token);
+        if(verified){
+        await ctx.db.traders.update({
+            twoFAActive:false,
+            secretKey:"none"
+        },{where:{
+            id:ctx.state.trader
+        }})
+        ctx.body={enable2FA:{
+           satus:1,
+           message:"2FA disabled"
+       }
+    }
+       }
+        else{
+           ctx.body={enable2FA:{
+               satus:0,
+               message:"Code mismatch, please enter correct code"
+           }
+        }
+       }
+   }
+       catch(err){
+           console.log(err);
+           ctx.body={enable2FA:{
+               satus:0,
+               message:"please retry"
+           }
+   
+           }
+       }
+   
 },
 async disableAccount(ctx){
     try{
+
+        
         let {password}=ctx.request.body;
     
         const trader  =await ctx.db.traders.findOne({
@@ -432,6 +545,14 @@ async changeLocalSelling(ctx){
     }catch(err){
   ctx.throw(500,err);
       }
+},
+checkParameters(parameter){
+    if (typeof parameter !== 'undefined') {
+        return true;
+    }
+   else if (typeof parameter === 'undefined') {
+        return false;
+    }
 }
 
 };

@@ -13,7 +13,12 @@ router.post('/changePassword',isAuthenticated,traderController.editPassword);
 router.post('/disableAccount',isAuthenticated,traderController.disableAccount);
 router.post('/deleteAccount',isAuthenticated,traderController.deleteAccount);
 router.post('/changeLS',isAuthenticated,traderController.changeLocalSelling);
-router.post('/getSecretKey',isAuthenticated,traderController.getSecretKey);
+router.get('/getSecretKey',isAuthenticated,traderController.getSecretKey);
+router.post('/enable2FA',isAuthenticated,traderController.enable2FA);
+router.post('/disable2FA',isAuthenticated,traderController.disable2FA);
+router.post('/check',traderController.checkParameters);
+
+
 //wallets
 router.get('/getWallets',isAuthenticated,walletsController.getAlljoin);
 router.post('/depositCrypto',isAuthenticated,walletsController.Deposit);

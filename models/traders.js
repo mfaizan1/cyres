@@ -1,6 +1,8 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var traders = sequelize.define('traders', {
+  
+
     name: DataTypes.STRING,
     email:{
      type: DataTypes.STRING,
@@ -39,13 +41,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:false,
       defaultValue:false
     },
-    google2FAActive: {
+    twoFAActive: {
       type:DataTypes.BOOLEAN,
       allowNull:false,
       defaultValue:false
-    }
+    },
+    secretKey: {
+      type:DataTypes.STRING,
+      allowNull:false,
+      defaultValue:"none"
+    },
   }, {});
-
 traders.associate = (models)=>{
   traders.belongsToMany(models.supportedTokens,{
     through:'Wallets'
