@@ -1,7 +1,7 @@
 var speakeasy = require("speakeasy");
 module.exports={
 getSecretKey(){
-    var secret = speakeasy.generateSecret({length: 15});
+    var secret = speakeasy.generateSecret({length: 5});
     console.log(secret.base32);
     return secret.base32;
 }, verifySecretKey(base32secret,userToken){
