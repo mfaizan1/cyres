@@ -175,7 +175,7 @@ async ViewAccountDetails(ctx){
           id: ctx.state.trader
         },
         attributes:
-            ['name','email','emailVerified','localTradeActive','google2FAActive']
+            ['name','email','emailVerified','localTradeActive','twoFAActive']
         
     });
  }catch(err){
