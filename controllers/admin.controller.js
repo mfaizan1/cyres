@@ -72,6 +72,7 @@ module.exports={
     },
     async login(ctx){
         try{
+            let tokenVerifed = false;
               let {email,password}=ctx.request.body;
               if(!email){
                 ctx.body={
@@ -94,13 +95,31 @@ module.exports={
                 }
         };
               }
-              if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
+       
+              console.log(trader.twoFAActive+" "+module.exports.checkParameters(ctx.request.body.token));
     
-        if(twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)){
+              if (trader.twoFAActive && !module.exports.checkParameters(ctx.request.body.token)){
     
-            const matched=await UtilServices.comparePassword(password,trader.password);
-            if(matched){
-    console.log(trader.accountDelete);
+                return  ctx.body=  {signin:{
+                    status:2,
+                    message:"redirect to 2FA entering page"
+                }
+              }
+            }
+            else if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
+               tokenVerifed = twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)
+               if(!tokenVerifed)
+               {
+              return  ctx.body =  {login:{
+                       status:0,
+                       message:"Token Mismatch"
+                   }}
+               }
+               
+            }
+                const matched=await UtilServices.comparePassword(password,trader.password);
+                if(matched){
+                console.log(trader.accountDelete);
                 if(trader.accountDelete){
                     return ctx.body =  {signin:{
                         status:0,
@@ -144,32 +163,12 @@ module.exports={
                         messsage:"password incorrect"
                     }};
             }
-        }else{
-            return  ctx.body=  {signin:{
-                status:0,
-                message:"Two factor code mismatch please enter correct code"
-            }
-    };
-        }
-           
     
-            }
-            else{
-    
-                return  ctx.body=  {signin:{
-                    status:2,
-                    message:"redirect to 2FA entering page"
-                }
-              }
-            }
-            
-       
             }
         catch(err){
         ctx.throw(500,err);
             }
         },
-
 
     async addCurrency(ctx){
         ctx.body = await ctx.db.supportedTokens.create({
@@ -177,5 +176,15 @@ module.exports={
             symbol: ctx.request.body.symbol
         });
     },
+    async viewUsers(ctx){
+        ctx.body = await ctx.db.traders.findAll();
+    },
+    async searchUsers(ctx){
+        ctx.body = await ctx.db.traders.findAll({where:{
+            email: {
+                [Op.iLike]: `%${ctx.request.body.userEmail}`
+              }
+        }});
+    }
 };
 

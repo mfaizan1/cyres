@@ -288,14 +288,14 @@ async enable2FA(ctx){
          id:ctx.state.trader
      }})
      ctx.body={enable2FA:{
-        satus:1,
+        status:1,
         message:"2FA enabled"
     }
  }
     }
      else{
         ctx.body={enable2FA:{
-            satus:0,
+            status:0,
             message:"Code mismatch, please enter correct code"
         }
      }
@@ -304,7 +304,7 @@ async enable2FA(ctx){
     catch(err){
         console.log(err);
         ctx.body={enable2FA:{
-            satus:0,
+            status:0,
             message:"please retry"
         }
 
@@ -337,14 +337,14 @@ async disable2FA(ctx){
             id:ctx.state.trader
         }})
         ctx.body={enable2FA:{
-           satus:1,
+           status:1,
            message:"2FA disabled"
        }
     }
        }
         else{
            ctx.body={enable2FA:{
-               satus:0,
+               status:0,
                message:"Code mismatch, please enter correct code"
            }
         }
@@ -353,7 +353,7 @@ async disable2FA(ctx){
        catch(err){
            console.log(err);
            ctx.body={enable2FA:{
-               satus:0,
+               status:0,
                message:"please retry"
            }
    
