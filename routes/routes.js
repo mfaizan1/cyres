@@ -35,7 +35,8 @@ router.post('/verficationApplication',isAuthenticated,applicationController.subm
 router.post('/addCurrency',adminController.addCurrency);
 router.post('/admin/signup',adminController.signup);
 router.post('/admin/login',adminController.login);
-router.post('/admin/viewUsers',isAuthenticatedAdmin,adminController.viewUsers);
+router.get('/admin/viewUsers',isAuthenticatedAdmin,adminController.viewUsers);
+router.post('/admin/viewUser',isAuthenticatedAdmin,adminController.viewUser);
 router.post('/admin/searchUsers',isAuthenticatedAdmin,adminController.searchUsers);
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);

@@ -192,6 +192,15 @@ module.exports={
         }});
     },async viewUser(ctx){
 
+    },
+    async allApplications(ctx){
+
+        ctx.body=  await ctx.verificationApplicaitons.findAll({
+            where:{
+                status:"Review Pending"
+            }
+        });
     }
+
 };
 
