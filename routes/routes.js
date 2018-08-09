@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const router = new Router();
 const isAuthenticated= require('./../policies/isAuthenticated');
+const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
 
 const {traderController,walletsController,applicationController,adminController,localTradeController} =  require('./../controllers');
 //trader
@@ -32,7 +33,10 @@ router.get('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZeroB
 router.post('/verficationApplication',isAuthenticated,applicationController.submitApplication);
 //admin
 router.post('/addCurrency',adminController.addCurrency);
-
+router.post('/admin/signup',adminController.signup);
+router.post('/admin/login',adminController.login);
+router.post('/admin/viewUsers',isAuthenticatedAdmin,adminController.viewUsers);
+router.post('/admin/searchUsers',isAuthenticatedAdmin,adminController.searchUsers);
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);

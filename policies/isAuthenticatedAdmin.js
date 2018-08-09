@@ -15,12 +15,11 @@ module.exports = async (ctx,next) => {
             }
         }
     }
-    const trader  = await ctx.db.traders.findOne({ where: {id: decodedToken.payload.trader} });
-    if (trader){
-        ctx.state.trader = trader.id;
+    const admin  = await ctx.db.admin.findOne({ where: {id: decodedToken.payload.admin} });
+    if (admin){
+        ctx.state.admin = admin.id;
           await next();
     }
-    
     else {
         ctx.throw(401,"unauthorized");
     }

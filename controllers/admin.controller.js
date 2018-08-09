@@ -1,6 +1,7 @@
-// const UtilServices =  require('./../utils/util.service');
-// const JwtServices = require('./../utils/jwt.service');
-
+const UtilServices =  require('./../utils/util.service');
+const JwtServices = require('./../utils/jwt.service');
+const Sequelize =  require('sequelize');
+const Op = Sequelize.Op;
 module.exports={
 
     async signup(ctx){
@@ -33,9 +34,9 @@ module.exports={
                 };
             }
             const hashpassword=await UtilServices.hashPassword(password);
-             await ctx.db.traders.findOrCreate({where: {email}, defaults: {name,password:hashpassword}})
-            .spread((traders, created) => {
-              console.log(traders.get({
+             await ctx.db.admin.findOrCreate({where: {email}, defaults: {name,password:hashpassword}})
+            .spread((admin, created) => {
+              console.log(admin.get({
                 plain: true
               }));
               console.log(created);
@@ -67,7 +68,11 @@ module.exports={
             
             });
     }catch(err){
-            ctx.throw(500,"database query failed : "+err);
+        console.log(err);
+            ctx.body={sigup:{
+                status:0,
+                message:"databse query failed"
+            }};
         }
     },
     async login(ctx){
@@ -82,13 +87,13 @@ module.exports={
                     }
                 }
               }
-              const trader  =await ctx.db.traders.findOne({
+              const admin  =await ctx.db.admin.findOne({
                   where :{
                     email
                   },
                 
               });
-              if (trader === null){
+              if (admin === null){
                 return  ctx.body=  {signin:{
                     status:0,
                     message:"No such user found"
@@ -96,46 +101,46 @@ module.exports={
         };
               }
        
-              console.log(trader.twoFAActive+" "+module.exports.checkParameters(ctx.request.body.token));
+            //   console.log(admin.twoFAActive+" "+module.exports.checkParameters(ctx.request.body.token));
     
-              if (trader.twoFAActive && !module.exports.checkParameters(ctx.request.body.token)){
+            //   if (admin.twoFAActive && !module.exports.checkParameters(ctx.request.body.token)){
     
-                return  ctx.body=  {signin:{
-                    status:2,
-                    message:"redirect to 2FA entering page"
-                }
-              }
-            }
-            else if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
-               tokenVerifed = twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)
-               if(!tokenVerifed)
-               {
-              return  ctx.body =  {login:{
-                       status:0,
-                       message:"Token Mismatch"
-                   }}
-               }
+            //     return  ctx.body=  {signin:{
+            //         status:2,
+            //         message:"redirect to 2FA entering page"
+            //     }
+            //   }
+            // }
+            // else if(admin.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
+            //    tokenVerifed = twoFa.verifySecretKey(admin.secretKey,ctx.request.body.token)
+            //    if(!tokenVerifed)
+            //    {
+            //   return  ctx.body =  {login:{
+            //            status:0,
+            //            message:"Token Mismatch"
+            //        }}
+            //    }
                
-            }
-                const matched=await UtilServices.comparePassword(password,trader.password);
+            // }
+                const matched=await UtilServices.comparePassword(password,admin.password);
                 if(matched){
-                console.log(trader.accountDelete);
-                if(trader.accountDelete){
+                console.log(admin.accountDelete);
+                if(admin.accountDelete){
                     return ctx.body =  {signin:{
                         status:0,
                         message:"Account deleted please signup with new email if you want to use this platform"
                     }}
                 }
                 let additionalMessage='';
-                if(!trader.accountActive){
+                if(!admin.accountActive){
     
-                const record = await ctx.db.traders.update(
+                const record = await ctx.db.admins.update(
                 {
                 accountActive: true,
                 },
                 {
                 where: {
-                    id:trader.id
+                    id:admin.id
                 }
                });
                if (record[0]==1){
@@ -145,7 +150,7 @@ module.exports={
                }
               const token =  JwtServices.issue({
                  payload:{
-                      trader:trader.id
+                      admin:admin.id
               }
             },'3h');
     
@@ -182,9 +187,11 @@ module.exports={
     async searchUsers(ctx){
         ctx.body = await ctx.db.traders.findAll({where:{
             email: {
-                [Op.iLike]: `%${ctx.request.body.userEmail}`
+                [Op.iLike]: `${ctx.request.body.userEmail}%`
               }
         }});
+    },async viewUser(ctx){
+
     }
 };
 
