@@ -38,6 +38,12 @@ router.post('/admin/login',adminController.login);
 router.get('/admin/viewUsers',isAuthenticatedAdmin,adminController.viewUsers);
 router.post('/admin/viewUser',isAuthenticatedAdmin,adminController.viewUser);
 router.post('/admin/searchUsers',isAuthenticatedAdmin,adminController.searchUsers);
+router.post('/admin/deleteUser',isAuthenticatedAdmin,adminController.deleteUser);
+router.get('/admin/allApplications',isAuthenticatedAdmin,adminController.allApplications);
+router.post('/admin/application',isAuthenticatedAdmin,adminController.application);
+router.post('/admin/approveApplication',isAuthenticatedAdmin,adminController.approveApplication);
+router.post('/admin/rejectApplication',isAuthenticatedAdmin,adminController.rejectApplication);
+router.get('/admin/withdraws',isAuthenticatedAdmin,adminController.withdraws);
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);

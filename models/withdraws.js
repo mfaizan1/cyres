@@ -10,7 +10,11 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.DECIMAL,
       allowNull:false,
     } ,
-    email_approved: {
+    emailApproved: {
+      type:DataTypes.BOOLEAN,
+      defaultValue:false,
+    },
+    adminApproved: {
       type:DataTypes.BOOLEAN,
       defaultValue:false,
     },

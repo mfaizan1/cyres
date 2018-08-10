@@ -192,15 +192,86 @@ module.exports={
         }});
     },async viewUser(ctx){
 
+        await ctx.db.sequelize.query('select "traders"."name","traders"."email","traders"."emailVerified","traders"."accountActive","traders"."accountDelete","traders"."localTradeActive","traders"."twoFAActive","traders"."secretKey","Wallets"."balance" from "traders"  \
+        full outer join "Wallets" on "Wallets"."traderId" = "traders"."id" \
+        full outer join "supportedTokens" on  "supportedTokens"."id" = "Wallets"."supportedTokenId" \
+        where "traders"."id" =  :id ',{replacements:{
+            id:ctx.request.body.traderId
+        }}).spread((results, metadata) => {
+            console.log(results);
+          ctx.body=results;
+      });
+
     },
     async allApplications(ctx){
 
-        ctx.body=  await ctx.verificationApplicaitons.findAll({
+        ctx.body=  await ctx.db.verificationApplication.findAll({
             where:{
                 status:"Review Pending"
             }
         });
+    },
+    async application(ctx){
+        ctx.body =  await ctx.db.verificationApplication.findOne({
+            where:{
+                id:ctx.request.body.applicationId
+            }
+        })
+    },
+    async approveApplication(ctx){
+
+        ctx.body=  await ctx.db.verificationApplication.update({
+                status:"Verified"
+            },
+            {where:{
+                id:ctx.request.body.applicationId
+            }}
+        );
+    },
+    async rejectApplication(ctx){
+
+        ctx.body=  await ctx.db.verificationApplication.update({
+            status:"Rejected",
+            reason:ctx.request.body.comment
+        },
+        {where:{
+            id:ctx.request.body.applicationId
+        }}
+    );
+    },
+    async deleteUser(ctx){
+
+       const result= await  ctx.db.traders.update({
+            accountDelete:true
+        },
+     {   where:{
+        id:ctx.request.body.traderId
+        }
+    });
+    if (result[0]==1){
+        ctx.body={
+            deleteuser:{
+                status:1,
+                message:"User Deleted Successfully"
+            }
+        }
+        }else{
+            ctx.body={
+                deleteuser:{
+                    status:0,
+                    message:"Unable to delete user, try again."
+                }
+            }
+        }
+    },async withdraws(ctx){
+        ctx.body = await ctx.db.withdraws.findAll({
+            where:{
+                adminApproved:false
+            }
+        })
+
     }
+    
 
 };
 

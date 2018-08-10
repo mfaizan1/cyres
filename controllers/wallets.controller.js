@@ -92,7 +92,7 @@ async hideZeroBalanceWallets(ctx){
             }
         });
         if(wallet.balance < ctx.request.body.amount){
-            ctx.body = {
+           return ctx.body = {
                 withdraw:{
                     status:0,
                     message:"Amount you entered is more than your balance, you can only withdraw upto "+wallet.balance+"."
@@ -103,7 +103,7 @@ async hideZeroBalanceWallets(ctx){
                 addres_to:ctx.request.body.address,
                 amount : ctx.request.body.amount,
                 traderId : ctx.state.trader,
-                walletId: coin.id,
+                walletId: ctx.request.walletId,
             });
          const reaminingBalance = wallet.balance-ctx.request.body.amount;
             
