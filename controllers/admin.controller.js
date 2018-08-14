@@ -220,24 +220,50 @@ module.exports={
     },
     async approveApplication(ctx){
 
-        ctx.body=  await ctx.db.verificationApplication.update({
-                status:"Verified"
+        try{
+
+            await ctx.db.verificationApplication.update({
+                status:"Verified",
+                reason:ctx.request.body.comment
             },
             {where:{
                 id:ctx.request.body.applicationId
             }}
         );
+            ctx.body={approveApplication:{
+                status:1,
+                message: 'Application approved'
+            }}
+        }catch(err){
+            ctx.body={approveApplication:{
+                status:0,
+                message: 'update failed'
+            }}
+        }
+        
     },
     async rejectApplication(ctx){
+try{
 
-        ctx.body=  await ctx.db.verificationApplication.update({
-            status:"Rejected",
-            reason:ctx.request.body.comment
-        },
-        {where:{
-            id:ctx.request.body.applicationId
-        }}
-    );
+    await ctx.db.verificationApplication.update({
+        status:"Rejected",
+        reason:ctx.request.body.comment
+    },
+    {where:{
+        id:ctx.request.body.applicationId
+    }}
+);
+    ctx.body={rejectApplication:{
+        status:1,
+        message: 'Application rejected'
+    }}
+}catch(err){
+    ctx.body={rejectApplication:{
+        status:0,
+        message: 'update failed'
+    }}
+}
+
     },
     async deleteUser(ctx){
 
