@@ -7,7 +7,6 @@ socket.on('join',(params,callbak)=>{
     callbak();
 
 });
-    
         socket.on('createMessage', (message,callback) => {
             console.log(message.text);
             io.to(message.room).emit('newMessage', {text: message.text,

@@ -1,28 +1,22 @@
 
-const Router = require('koa-router');
-const router = new Router();
-const isAuthenticated= require('./../policies/isAuthenticated');
-const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
-
-
-router.get('/localtrade/chat',(ctx)=>{
-    ctx.io.on('connection',(socket)=>{
+// const Router = require('koa-router');
+// const router = new Router();
+// const isAuthenticated= require('./../policies/isAuthenticated');
+// const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
+module.exports=function(io){
+    io.on('connection',(socket)=>{
         console.log("new user connected");
-socket.on('join',(params,callbak)=>{
-    socket.join(params.room);
-    callbak();
-
-});
-    
-        socket.on('createMessage', (message,callback) => {
-            console.log(message.text);
-            io.to(message.room).emit('newMessage', {text: message.text,
-            room:message.room}); 
-            callback();
-          });
-    });
-console.log("hello");
-});
+        socket.on('newMessage',(msg)=>{
+            console.log(msg);
+        });
+    });   
+}
+  
 
 
-module.exports = router;
+// router.get('/localtrade/chat',(ctx)=>{
+
+// });
+
+
+// module.exports = router;

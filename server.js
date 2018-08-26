@@ -2,7 +2,7 @@ const koa = require("koa");
 const bodyParser = require("koa-parser");
 const db= require("./models");
 const router = require("./routes/routes");
-const chatRouter = require('./routes/chatroutes')
+// const chatRouter = require('./routes/chatroutes')
 const koaBody = require('koa-body');
 const cors = require('koa2-cors');
 const http = require('http');
@@ -22,8 +22,8 @@ catch((err)=>console.log(err))
 app.context.db=db;
 const server = http.createServer(app.callback());
 const io = socketio(server);
-app.context.io = io
-
+// app.context.io = io;
+require('./routes/chatroutes')(io);
 
 server.listen(PORT,function(){
     console.log(`listening oooon ${PORT}`);

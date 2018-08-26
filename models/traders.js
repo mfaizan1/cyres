@@ -61,6 +61,10 @@ traders.associate = (models)=>{
   traders.hasOne(models.verificationApplication);
   traders.hasMany(models.feedback, {as: 'trader',foreignKey : 'traderId'});
   traders.hasMany(models.feedback, {as: 'feedbacker',foreignKey : 'feedbackClientId'});
+  traders.hasMany(models.conversation, {as: 'userOne',foreignKey : 'userOneId'});
+  traders.hasMany(models.conversation, {as: 'userTwo',foreignKey : 'userTwoId'});
+  traders.hasMany(models.messages, {as: 'sender',foreignKey : 'senderId'});
+  traders.hasMany(models.messages, {as: 'reciever',foreignKey : 'recieverId'});
   traders.belongsToMany(models.supportedTokens,{
     through:'Wallets'
   });
