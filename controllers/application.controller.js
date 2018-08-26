@@ -67,8 +67,6 @@ where :{
       }
       const files = ctx.request.files;
          Object.keys(files).forEach(function(key){
-             
-      
             const reader = fs.createReadStream(files[key].path);
             const finalPath=path.join(uploadPath ,files[key].name)
             const stream = fs.createWriteStream(finalPath);

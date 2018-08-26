@@ -130,14 +130,5 @@ async hideZeroBalanceWallets(ctx){
     catch(err){
         console.log(500,err)
     }
-
-
-
   }
-
-
-
-
-
-
 };
