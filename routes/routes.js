@@ -3,7 +3,7 @@ const router = new Router();
 const isAuthenticated= require('./../policies/isAuthenticated');
 const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
 
-const {traderController,walletsController,applicationController,adminController,localTradeController} =  require('./../controllers');
+const {traderController,walletsController,applicationController,adminController,localTradeController,chatController} =  require('./../controllers');
 //trader
 router.post('/signup',traderController.signup);
 router.post('/login',traderController.login);
@@ -56,5 +56,14 @@ router.post('/localtrade/localTrade',isAuthenticated,localTradeController.localT
 router.post('/localtrade/cancelTrade',isAuthenticated,localTradeController.cancelTrade);
 router.post('/localtrade/completeTrade',isAuthenticated,localTradeController.completeTrade);
 router.post('/localtrade/feedback',isAuthenticated,localTradeController.feedback);
+
+
+
+
+router.post('/chat/conversation',isAuthenticated,chatController.createOrFindConversation);
+router.post('/chat/insertMessage',isAuthenticated,chatController.insertMessage);
+router.get('/chat/findConversations',isAuthenticated,chatController.findConversations);
+router.post('/chat/sendImage',isAuthenticated,chatController.sendImage);
+
 
 module.exports = router;

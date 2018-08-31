@@ -14,42 +14,29 @@ try{
             traderId:ctx.state.trader
         }
     });
-    console.log(already_exist);
-    if(already_exist!==null){
-     console.log("found");
-ctx.body={
-    addressavailable:{
-    status:1,
-    address:already_exist.address,
-}};
-    }else{
-        console.log("not found");
-        if(coin.id===1){
-        ctx.body = await ctx.db.Wallets.create({
-            address:"xrp123asdknmnk123kanm",
-            balance:0,
+    if(already_exist.address=="Not assigned"){
+        console.log("not assigned")
+            const update =  await ctx.db.Wallets.update(
+        {address:`${ctx.request.body.symbol}gibberishaskdjlasd`}
+      ,{where:
+        {supportedTokenId:coin.id,
+        traderId:ctx.state.trader}}
+     )      
+    }
+  
+   const wallet =await ctx.db.Wallets.findOne({
+        attributes:['address'],
+        where:{
             supportedTokenId:coin.id,
             traderId:ctx.state.trader
-        });
-    }else if (coin.id===2){
-        ctx.body = await ctx.db.Wallets.create({
-            address:"eos123asdknmnk123kanm",
-            balance:0,
-            supportedTokenId:coin.id,
-            traderId:ctx.state.trader
-        });
+        }
+    });
+ctx.body = {
+    addressavailable: {
+        "status": 1,
+        "address": wallet.address
     }
-    else if (coin.id===3){
-        ctx.body = await ctx.db.Wallets.create({
-            address:"btc123asdknmnk123kanm",
-            balance:50,
-            supportedTokenId:coin.id,
-            traderId:ctx.state.trader
-        });
-    }
-    }
-
-
+}
 }catch(err){
 
 }
@@ -57,13 +44,47 @@ ctx.body={
 },
 async getAlljoin(ctx){
     try{
-        // where \"traderId\" = :traderId" ,{replacements:{
-        //     traderId:ctx.state.trader
-        // }}
-  await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" ")
+    
+    let initialWallets = null;
+     await ctx.db.sequelize.query(' select * from "Wallets" inner JOIN "supportedTokens" ON "Wallets"."supportedTokenId" = "supportedTokens"."id" and "Wallets"."traderId" = :traderId',{replacements:{
+        traderId:ctx.state.trader
+    }})
     .spread((results, metadata) => {
-        ctx.body=results;
+
+        initialWallets  =  results;
     });
+
+    console.log(`lenght ${initialWallets.length}`)
+    if(initialWallets.length==0){
+        const supportedTokens = await  ctx.db.supportedTokens.findAll({attributes:['id'],raw:true});
+        for (var key in supportedTokens) {
+            await ctx.db.Wallets.create({
+                address:"Not assigned",
+                balance: Math.floor(Math.random() * 100),
+                traderId: ctx.state.trader,
+                supportedTokenId: supportedTokens[key].id
+            });
+        
+       }
+       await ctx.db.sequelize.query(' select * from "Wallets" inner JOIN "supportedTokens" ON "Wallets"."supportedTokenId" = "supportedTokens"."id" and "Wallets"."traderId" = :traderId',{replacements:{
+        traderId: ctx.state.trader
+        }})
+     .spread((results, metadata) => {
+       ctx.body  =  results;
+    });
+
+
+
+         }
+         else{
+             ctx.body =  initialWallets
+         }
+
+
+//   await ctx.db.sequelize.query("select * from \"supportedTokens\" LEFT OUTER JOIN \"Wallets\" ON \"supportedTokens\".\"id\" = \"Wallets\".\"supportedTokenId\" ")
+//     .spread((results, metadata) => {
+//         ctx.body=results;
+//     });
       
     }catch(err){
         console.log(err);

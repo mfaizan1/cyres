@@ -7,6 +7,7 @@ const koaBody = require('koa-body');
 const cors = require('koa2-cors');
 const http = require('http');
 const socketio =  require('socket.io');
+const formidable = require('koa2-formidable')
 const PORT = process.env.PORT||8000;
 
 const app = new koa();
