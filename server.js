@@ -17,7 +17,7 @@ app.use(bodyParser());
 app.use(router.routes());
 // app.use(chatRouter.routes());
 
-db.sequelize.sync({force:true}).
+db.sequelize.sync({force:false}).
 then(()=>console.log("table generated")).
 catch((err)=>console.log(err))
 app.context.db=db;
