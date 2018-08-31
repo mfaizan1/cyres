@@ -64,6 +64,7 @@ router.post('/chat/conversation',isAuthenticated,chatController.createOrFindConv
 router.post('/chat/insertMessage',isAuthenticated,chatController.insertMessage);
 router.get('/chat/findConversations',isAuthenticated,chatController.findConversations);
 router.post('/chat/sendImage',isAuthenticated,chatController.sendImage);
+router.post('/chat/prevMessages',isAuthenticated,chatController.prevMessages);
 
 
 module.exports = router;

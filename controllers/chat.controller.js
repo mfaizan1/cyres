@@ -66,15 +66,8 @@ module.exports={
                    status:0,
                    message: "You can only send png or jpeg file"
                }
-
                }
             }
-
-   
-        //   console.log(key,url);
-        //   ctx.body = { key, url } ;
-     
-        
         } catch(err){
             console.log(err);
             ctx.body={imagesend:{
@@ -86,6 +79,15 @@ module.exports={
         } 
   
       },
+      async prevMessages(ctx){
+
+        ctx.body = await ctx.db.messages.findAll({
+            where:{
+                conversationId:ctx.request.body.conversationId
+            }
+        })
+      }
+      ,
 async findConversations(ctx){
 
     const conToSearch = [];
