@@ -185,7 +185,6 @@ async createOrFindConversation(ctx){
 },
 async insertMessage(ctx){
     try{
-
     const conversation = await ctx.db.conversation.findOne({where:{
         id : ctx.request.body.conversationId
     }});
@@ -215,8 +214,6 @@ async insertMessage(ctx){
             message:"wrong credentials"
         }}
     }
-
-
 }catch(err)
 {
     console.log(err);

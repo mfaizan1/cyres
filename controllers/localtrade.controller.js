@@ -341,7 +341,7 @@ async myLocalActiveTrades(ctx){
         await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven","traders"."name" as "traderName" ,"supportedTokens"."name"  from "localTrades" \
         join "traders" on "localTrades"."traderId" = "traders"."id" \
         join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
-        where "localTrades"."clientId" = :traderId OR "localTrades"."traderId" = :traderId' ,{replacements:{
+        where "localTrades"."status" = "active" and  "localTrades"."clientId" = :traderId OR "localTrades"."traderId" = :traderId' ,{replacements:{
         traderId:ctx.state.trader,
         }}).spread((results, metadata) => {
             ctx.body= results;
