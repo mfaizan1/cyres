@@ -222,9 +222,9 @@ async tradePage(ctx){
     try{
         let details=null;
         let totalTrades= null;
-        console.log(ctx.body);
+        console.log("ctx.body "+ctx.body);
 
-        const already_active=await ctx.db.localTrade.findOne({
+        const already_active= await ctx.db.localTrade.findOne({
             where:{
                 status:"Active",
                 clientId:ctx.state.trader,
@@ -232,7 +232,7 @@ async tradePage(ctx){
                 traderId:ctx.request.body.traderId
             }
         })
-        console.log(already_active);
+        console.log("ctx.body "+already_active);
         if (already_active){
             return ctx.request.body={ tradePage:{
                 status:2,
