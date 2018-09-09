@@ -234,7 +234,7 @@ async tradePage(ctx){
         })
         console.log("ctx.body "+already_active);
         if (already_active){
-            return ctx.request.body={ tradePage:{
+            return ctx.body={ tradePage:{
                 status:2,
                 message:"already initiated",
                 tradeId:already_active.id
