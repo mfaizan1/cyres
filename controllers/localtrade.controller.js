@@ -260,13 +260,6 @@ if (details){
           }}
   });
 
-//   await ctx.db.sequelize.query(`select count("localTrades"."status") as "totalTrades" \
-//   from "localTrades" where "localTrades"."status" = 'Completed' and "localTrades"."traderId" = :traderId`,{replacements:{
-//       traderId:ctx.request.body.traderId
-//   }}).spread((results, metadata) => {
-//       console.log(results);
-//       totalTrades=results;
-// });
 }
     }catch(err){
         ctx.body={traderProfile:{
@@ -578,9 +571,12 @@ async feedback(ctx){
     }catch(err){
         console.log(err);
     }
-
 }
-
+,async getSupportedTokens(ctx){
+        ctx.body =  await ctx.db.supportedTokens.findAll({
+            attributes:['id','symbol']
+        })
+}
 
 
 

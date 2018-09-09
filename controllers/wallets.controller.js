@@ -91,10 +91,14 @@ async getAlljoin(ctx){
     }
 },
 async hideZeroBalanceWallets(ctx){
-    await ctx.db.sequelize.query('select * from "supportedTokens" left OUTER JOIN "Wallets" ON "supportedTokens"."id" = "Wallets"."supportedTokenId" where  "Wallets"."balance" != 0')
-      .spread((results, metadata) => {
-          ctx.body=results;
-      });
+
+    await ctx.db.sequelize.query(' select * from "Wallets" inner JOIN "supportedTokens" ON "Wallets"."supportedTokenId" = "supportedTokens"."id" and "Wallets"."traderId" = :traderId and "Wallets"."balance" != 0',{replacements:{
+        traderId: ctx.state.trader
+        }})
+     .spread((results, metadata) => {
+       ctx.body  =  results;
+    });
+
   },
   async withdraw(ctx){
     try{

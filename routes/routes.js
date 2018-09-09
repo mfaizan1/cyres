@@ -57,6 +57,8 @@ router.post('/localtrade/cancelTrade',isAuthenticated,localTradeController.cance
 router.post('/localtrade/completeTrade',isAuthenticated,localTradeController.completeTrade);
 router.post('/localtrade/feedback',isAuthenticated,localTradeController.feedback);
 
+router.get('/getsupportedCoins',isAuthenticated,localTradeController.getSupportedTokens);
+
 
 
 
