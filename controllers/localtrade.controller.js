@@ -218,11 +218,27 @@ async search(ctx)
     console.log(err);
 }
 },
-async profile(ctx){
+async tradePage(ctx){
     try{
         let details=null;
         let totalTrades= null;
-        console.log("here");
+
+
+        const already_active=await ctx.db.escrow.findOne({
+            where:{
+                heldById:ctx.state.trader,
+                supportedTokenId:ctx.request.body.tokkenId,
+                traderId:ctx.request.body.traderId
+            }
+        })
+        console.log(already_active);
+        if (already_active){
+            return ctx.request.body={ tradePage:{
+                status:2,
+                message:"already initiated"
+            }
+            }
+        }
     await ctx.db.sequelize.query('select "traders"."id" as "traderId","traders"."name" as "traderName", "coinsToTrades"."id" as "tradeId","coinsToTrades"."minQuantity","coinsToTrades"."maxQuantity","coinsToTrades"."pricePerTokken","coinsToTrades"."supportedTokenId" as "tokenId", "coinsToTrades"."paymentMethod" , "verificationApplications"."status", \
     "supportedTokens"."name","supportedTokens"."symbol" \
     from "coinsToTrades" \
@@ -233,7 +249,6 @@ async profile(ctx){
     traderId:ctx.request.body.traderId,
     tokkenId:ctx.request.body.tokkenId
     }}).spread((results, metadata) => {
-        // console.log(results);
         details =results;
   });
 
@@ -244,7 +259,8 @@ if (details){
         traderId:ctx.request.body.traderId
     }}).spread((results, metadata) => {
         totalTrades=results;
-        ctx.body= {traderProfile:{
+        ctx.body= {tradePage:{
+            status:1,
             traderId: details[0].traderId,
             tokenId:details[0].tokenId,
             tradeId:details[0].tradeId,
@@ -262,7 +278,7 @@ if (details){
 
 }
     }catch(err){
-        ctx.body={traderProfile:{
+        ctx.body={tradePage:{
             status:0,
             message: "something went wrong at serverside"
         }}

@@ -49,7 +49,7 @@ router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade)
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);
 router.post('/localtrade/search',isAuthenticated,localTradeController.search);
 router.get('/localtrade/myListings',isAuthenticated,localTradeController.myLocalTrades);
-router.post('/localtrade/traderprofile',isAuthenticated,localTradeController.profile);
+router.post('/localtrade/tradePage',isAuthenticated,localTradeController.tradePage);
 router.post('/localtrade/initiatetrade',isAuthenticated,localTradeController.initiateTrade);
 router.get('/localtrade/myLocalTrades',isAuthenticated,localTradeController.myLocalActiveTrades);
 router.post('/localtrade/localTrade',isAuthenticated,localTradeController.localTrade);
