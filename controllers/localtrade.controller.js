@@ -222,7 +222,7 @@ async tradePage(ctx){
     try{
         let details=null;
         let totalTrades= null;
-
+        console.log(ctx.body);
 
         const already_active=await ctx.db.localTrade.findOne({
             where:{
