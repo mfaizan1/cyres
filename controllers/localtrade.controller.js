@@ -224,9 +224,10 @@ async tradePage(ctx){
         let totalTrades= null;
 
 
-        const already_active=await ctx.db.escrow.findOne({
+        const already_active=await ctx.db.localTrade.findOne({
             where:{
-                heldById:ctx.state.trader,
+                status:"Active",
+                clientId:ctx.state.trader,
                 supportedTokenId:ctx.request.body.tokkenId,
                 traderId:ctx.request.body.traderId
             }
@@ -235,7 +236,8 @@ async tradePage(ctx){
         if (already_active){
             return ctx.request.body={ tradePage:{
                 status:2,
-                message:"already initiated"
+                message:"already initiated",
+                tradeId:already_active.id
             }
             }
         }
@@ -272,7 +274,6 @@ if (details){
             paymentMethod:details[0].paymentMethod,
             documentStatus: details[0].status,
             totaltrades:totalTrades[0].totalTrades
-            
           }}
   });
 
