@@ -2,6 +2,7 @@ const UtilServices =  require('./../utils/util.service');
 const JwtServices = require('./../utils/jwt.service');
 const Sequelize = require('sequelize');
 const db= require("./../models");
+const Op = Sequelize.Op;
 module.exports={
 async myLocalTrades(ctx){
     try{
