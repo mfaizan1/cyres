@@ -664,7 +664,7 @@ async getLocaltrades(){
     });
 },
 async getTradeDetails(ctx){
-    const trade =  await ctx.db.localTrade.findOne({
+    ctx.body =  await ctx.db.localTrade.findOne({
         where:{
             id:ctx.request.body.localTradeId,
             [Op.or]: [{clientId: ctx.state.trader},{traderId:ctx.state.trader}]
