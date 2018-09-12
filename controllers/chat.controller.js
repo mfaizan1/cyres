@@ -6,14 +6,12 @@ var shortid = require('shortid');
 module.exports={
     async sendImage(ctx){
         try{
-    console.log("here");
           let {body, files} = ctx.request;
             if(files.file.type == 'image/jpg' ||files.file.type == 'image/png' || files.file.type == 'image/jpeg'  ){
             const { key, url }    = await  aws.uploadFile({
-              fileName: shortid.generate(),
               filePath:files.file.path,
               fileType:files.file.type,
-              conversationId:body.conversationId
+              key:`onversations/${body.conversationId}/${shortid.generate()}`
           });
           console.log(key,url);
             if (key==0 && url == 0){

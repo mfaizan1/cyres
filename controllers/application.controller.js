@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-
+const aws = require("./../utils/uploadAws");
+const shortid =  require('shortid');
 module.exports = {
 
 async submitApplication(ctx){
-
+    let {body, files} = ctx.request;
         try{
         if ('POST' != ctx.method) return await next();
 
@@ -19,13 +20,7 @@ if(previousApplication!==null){
             verificationApplicationId:previousApplication.id
         }
     });
-    Object.keys(allPictures).forEach(function(key){
 
-        fs.unlink(allPictures[key].path, (err) => {
-            if (err) throw err;
-            console.log(`${allPictures[key].path} deleted`);
-          });
-    });
 
     await ctx.db.applicationPictures.destroy({
         where:{
@@ -37,7 +32,6 @@ if(previousApplication!==null){
             id:previousApplication.id
         }
     });
-
 }
      const application   =   await ctx.db.verificationApplication.create({
             fullname:ctx.request.body.fullname,
@@ -47,51 +41,70 @@ if(previousApplication!==null){
             cardNumber:ctx.request.body.cardNumber,
             traderId:ctx.state.trader
         });
-        if(application!==null){
-    const trader = await ctx.db.traders.findOne({
-where :{
-    id:ctx.state.trader
-}
-    });
-    let  uploadPath=null;
 
-    try {
-        fs.mkdirSync(`./uploads/${trader.email}`);
-        uploadPath = `./uploads/${trader.email}`;
-      } catch (err) {
-        if (err.code === 'EEXIST'){
-        uploadPath = `./uploads/${trader.email}`;
-        } else{
-           throw err 
-        }
-      }
-      const files = ctx.request.files;
-         Object.keys(files).forEach(function(key){
-            const reader = fs.createReadStream(files[key].path);
-            const finalPath=path.join(uploadPath ,files[key].name)
-            const stream = fs.createWriteStream(finalPath);
-            reader.pipe(stream).on('finish',()=>{
-    
-                ctx.db.applicationPictures.create({
-                    path:   finalPath,
-                    verificationApplicationId:application.id
+
+   
+
+            if (application !== null) {
+                const trader = await ctx.db.traders.findOne({
+                    where: {
+                        id: ctx.state.trader
+                    }
                 });
-            });
+        
+                const files = ctx.request.files;
+                for (var KeyVal in files) {
+                    var item = files[KeyVal];
+                    console.log(`item : ${item}`)
             
+                    const { key, url } = await  aws.uploadFile({
+                        filePath: item.path,
+                        fileType: item.path,
+                        key: `applications/${trader.id}/${application.id}/${shortid.generate()}`,
+                    });
 
-        });
-}
+                    ctx.db.applicationPictures.create({
+                        path: url,
+                        verificationApplicationId: application.id
+                    });
+                }
+
+                // for (var key in files) {
+                //     var item = files[key];
+                //     console.log("hey"+files[key])
+                //     const { key, url } = await  aws.uploadFile({
+                //         filePath: files[key].path,
+                //         fileType: files[key].path,
+                //         key: `applications/${trader.id}/${application.id}/${shortid.generate()}`,
+                //     });
+
+                //     ctx.db.applicationPictures.create({
+                //         path: url,
+                //         verificationApplicationId: application.id
+                //     });
+          
+                }
+        
+            // }
 ctx.body = {verificationApplication:{
     status:1,
     message:"Application submitted successfully"
 }}
 
-}catch(err){
+
+//match
+        }
+catch(err){
+    console.log(err);
 ctx.body = {verificationApplication:{
     status:0,
     message:"some problem happend please try again"
-}}
+}
 }
 
 }
+
+//match
+}
+
 }

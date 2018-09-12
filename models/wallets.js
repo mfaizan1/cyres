@@ -11,8 +11,7 @@ module.exports = (sequelize, DataTypes) => {
 
 
   Wallets.associate=(models)=>{
-    Wallets.hasMany(models.Withdraws,{foreignKey: 'walletId', sourceKey: 'walletId'});
-
+      Wallets.hasMany(models.Withdraws,{foreignKey: 'walletId', sourceKey: 'walletId'});
   }
   return Wallets;
 };

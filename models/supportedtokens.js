@@ -13,6 +13,7 @@ supportedTokens.associate = (models)=>{
   supportedTokens.hasMany(models.coinsToTrade);
   supportedTokens.hasMany(models.localTrade);
   supportedTokens.hasMany(models.escrow);
+  supportedTokens.hasOne(models.ExchangeWallets);
 };
 
   return supportedTokens;

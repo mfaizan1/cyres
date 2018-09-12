@@ -50,12 +50,15 @@ router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocal
 router.post('/localtrade/search',isAuthenticated,localTradeController.search);
 router.get('/localtrade/myListings',isAuthenticated,localTradeController.myLocalTrades);
 router.post('/localtrade/tradePage',isAuthenticated,localTradeController.tradePage);
-router.post('/localtrade/initiatetrade',isAuthenticated,localTradeController.initiateTrade);
+router.post('/localtrade/initiatetrade',isAuthenticated,localTradeController.initiateBuyTrade);
 router.get('/localtrade/myLocalTrades',isAuthenticated,localTradeController.myLocalActiveTrades);
 router.post('/localtrade/localTrade',isAuthenticated,localTradeController.localTrade);
 router.post('/localtrade/cancelTrade',isAuthenticated,localTradeController.cancelTrade);
 router.post('/localtrade/completeTrade',isAuthenticated,localTradeController.completeTrade);
 router.post('/localtrade/feedback',isAuthenticated,localTradeController.feedback);
+router.get('/localtrade/allLocalTrades',localTradeController.getLocaltrades);
+router.post('/localtrade/getTradeDetails',isAuthenticated,localTradeController.getTradeDetails);
+
 
 router.get('/getsupportedCoins',isAuthenticated,localTradeController.getSupportedTokens);
 

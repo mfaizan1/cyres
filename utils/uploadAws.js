@@ -1,7 +1,7 @@
 const aws = require("aws-sdk");
 const fs = require("fs");
 
-const uploadFile = async ({ fileName, filePath, fileType,conversationId }) => {
+const uploadFile = async ({ filePath, fileType,key }) => {
   return new Promise((resolve, reject) => {
     aws.config.update({
       region: "ap-south-1",
@@ -24,7 +24,7 @@ const uploadFile = async ({ fileName, filePath, fileType,conversationId }) => {
         // You'll input your bucket name here
         Bucket: "faizan123",
         Body: stream,
-        Key: `conversations/${conversationId}/${fileName}`,
+        Key: key,
         ContentType: fileType,
       },
       function(err, data) {

@@ -26,6 +26,12 @@ module.exports = {
       paymentMethod: {
         type: Sequelize.STRING
       },
+      active: {
+        type: Sequelize.BOOLEAN
+      },
+      delete: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -21,10 +21,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:false,
       unique:"compositeIndex"
       
+    },
+
+    active: {
+      type:DataTypes.BOOLEAN,
+      default:'true'
+    },
+    delete:{
+      type:DataTypes.BOOLEAN,
+      default:'false'
     }
   }, {});
   coinsToTrade.associate = function(models) {
-    // associations can be defined here
-  };
+    coinsToTrade.hasMany(models.localTrade);
+    };
   return coinsToTrade;
 };

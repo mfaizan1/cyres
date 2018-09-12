@@ -1,6 +1,7 @@
 const UtilServices =  require('./../utils/util.service');
 const JwtServices = require('./../utils/jwt.service');
 const Sequelize = require('sequelize');
+const db= require("./../models");
 module.exports={
 async myLocalTrades(ctx){
     try{
@@ -286,7 +287,7 @@ if (details){
         console.log(err);
     }
 },
-async initiateTrade(ctx){
+async initiateBuyTrade(ctx){
 
     try{
 
@@ -314,9 +315,12 @@ async initiateTrade(ctx){
               },{where:{
                   traderId:ctx.request.body.traderId
               }}, {transaction: t});
-            });
+            }).then(function(Wallets){
+                // return ctx.db.coinsToTrade.findOne({
+
+                // })
+            },{transaction:t});
           }).then(function (Wallets) {
-              console.log(Wallets);
             ctx.body= { buy:{
                 status:1,
                 message:"Buy request sent"
@@ -450,9 +454,6 @@ async cancelTrade(ctx){
 
 }
 ,async completeTrade(ctx){
-
-
-
     try{
         return ctx.db.sequelize.transaction(function (t) {
             console.log("here");
@@ -472,11 +473,17 @@ async cancelTrade(ctx){
                 
               }).then(function (escrow) {
               return ctx.db.Wallets.update({
-                field: Sequelize.literal(`balance + ${ctx.request.body.quantity}`)
+                field: Sequelize.literal(`balance + ${escrow.quantity-(escrow.quantity*0.01)}`)
               },{where:{
                   traderId:escrow.heldById
               }}, {transaction: t});
-            }).then(function (localTrade) {
+            }).then(function (escrow) {
+                return ctx.db.ExchangeWallets.update({
+                  field: Sequelize.literal(`balance + ${escrow.quantity*0.01}`)
+                },{where:{
+                    supportedTokenId:escrow.supportedTokenId
+                }}, {transaction: t});
+              }).then(function (localTrade) {
                 return ctx.db.escrow.destroy({where:{
                     localTradeId:ctx.request.body.localTradeId,
                     traderId:ctx.state.trader
@@ -592,6 +599,75 @@ async feedback(ctx){
 ,async getSupportedTokens(ctx){
         ctx.body =  await ctx.db.supportedTokens.findAll({
             attributes:['id','symbol']
+        })
+},
+async getLocaltrades(){
+    console.log("hello");
+    const dates = await db.localTrade.findAll({
+        where:{
+            status:"Active"
+        },
+
+          attributes:['id','createdAt'],
+          raw:true
+    })
+    console.log(dates);
+
+    dates.forEach(element => {
+        console.log(element.createdAt);
+        const timePassed = (Date.now() - Date.parse(element.createdAt))/60000;
+        console.log((Date.now() - Date.parse(element.createdAt))/60000)
+        console.log(element)
+        if(timePassed>180){
+            try{
+        return db.sequelize.transaction(function (t) {
+                    // chain all your queries here. make sure you return them.
+                    return db.localTrade.update({
+                          status:'Cancelled'
+                      },{where:{
+                        id:element.id
+                    }}, {transaction: t}).then(function (localTrade) {
+                        console.log(localTrade);
+                        return db.escrow.findOne({where:{
+                            localTradeId:element.id,
+                          }}, {transaction: t})
+                      }).then(function (escrow) {
+                          console.log(escrow);
+                      return db.Wallets.update({
+                        balance: Sequelize.literal(`balance + ${escrow.quantity}`)
+                      },{where:{
+                          traderId:escrow.traderId
+                      }}, {transaction: t});
+                    }).then(function (escrow) {
+                        console.log(escrow);
+                        return db.escrow.destroy({where:{
+                            localTradeId:element.Id
+                          }}, {transaction: t})
+                      });
+                  }).then(function (Wallets) {
+                      console.log(Wallets);
+                    // Transaction has been committed
+                    // result is whatever the result of the promise chain returned to the transaction callback
+                  }).catch(function (err) {
+                      console.log(err);
+                    // Transaction has been rolled back
+                    // err is whatever rejected the promise chain returned to the transaction callback
+                  });
+        
+            }catch(err){
+    console.log(err);
+            }
+        }else{
+            console.log("let it stay");
+        }
+    });
+},
+async getTradeDetails(ctx){
+    const trade =  await ctx.db.localTrade.findOne({
+        where:{
+            id:ctx.request.body.localTradeId,
+            [Op.or]: [{clientId: ctx.state.trader},{traderId:ctx.state.trader}]
+        }
         })
 }
 

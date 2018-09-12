@@ -176,10 +176,26 @@ module.exports={
         },
 
     async addCurrency(ctx){
-        ctx.body = await ctx.db.supportedTokens.create({
-            name : ctx.request.body.name,
-            symbol: ctx.request.body.symbol
-        });
+    
+        return ctx.db.sequelize.transaction(function (t) {
+
+            // chain all your queries here. make sure you return them.
+            return  ctx.db.supportedTokens.create({
+                name : ctx.request.body.name,
+                symbol: ctx.request.body.symbol
+            }, {transaction: t}).then(function (supportedTokens) {
+              return ctx.db.ExchangeWallets.create({
+                supportedTokenId:supportedTokens.id,
+                balance:0
+              }, {transaction: t});
+            });
+          
+          }).then(function (result) {
+              ctx.body= {addcoin:{status:1,message:"coin added"}}
+           }).catch(function (err) {
+            ctx.body= {addcoin:{status:0,message:"couldn't add coin"}}
+          });
+
     },
     async viewUsers(ctx){
         ctx.body = await ctx.db.traders.findAll();

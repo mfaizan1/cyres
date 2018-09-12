@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     quantity: DataTypes.DECIMAL,
     status:{ 
       type:DataTypes.ENUM,
-    values:['Completed','Active','Cancelled','In dispute','Dispute over']},
+      values:['Completed','Active','Cancelled','In dispute','Dispute over']},
     feedbackGiven: DataTypes.BOOLEAN,
     traderId:{
       type:DataTypes.INTEGER,

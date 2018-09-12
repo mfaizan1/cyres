@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
       unique:true
     }
   }, {});
-  verificationApplication.associate = function(models) {
+    verificationApplication.associate = function(models) {
     verificationApplication.hasMany(models.applicationPictures)
   };
   return verificationApplication;
