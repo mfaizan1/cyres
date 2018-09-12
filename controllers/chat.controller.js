@@ -203,7 +203,8 @@ async insertMessage(ctx){
         if(message){
         ctx.body={messagesave:{
          status:1,
-        message:"message saved"
+        message:"message saved",
+        text:ctx.request.body.message
 }}
         }
     }else {
