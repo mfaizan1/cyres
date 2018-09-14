@@ -22,15 +22,14 @@ module.exports = (sequelize, DataTypes) => {
       unique:"compositeIndex"
       
     },
-
     active: {
       type:DataTypes.BOOLEAN,
-      default:'true',
+      defaultValue:true,
       
     },
     delete:{
       type:DataTypes.BOOLEAN,
-      default:'false'
+      defaultValue:false
     }
   }, {});
   coinsToTrade.associate = function(models) {
