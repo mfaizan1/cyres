@@ -29,11 +29,6 @@ module.exports=function(io){
                     }
                 }
             }
-            const trader  = await ctx.db.traders.findOne({ where: {id: decodedToken.payload.trader} });
-            if (trader){
-                ctx.state.trader = trader.id;
-                  await next();
-            }
 
 
 
