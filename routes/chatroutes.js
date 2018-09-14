@@ -21,6 +21,24 @@ module.exports=function(io){
             text=message.message;
       
             const decodedToken = JwtService.verify(message.token);
+            const decodedToken = JwtService.verify(token);
+            if(!decodedToken) {
+               return ctx.body={
+                    authorization:{
+                        status : 0,
+                        message:"token expired or malformed."
+                    }
+                }
+            }
+            const trader  = await ctx.db.traders.findOne({ where: {id: decodedToken.payload.trader} });
+            if (trader){
+                ctx.state.trader = trader.id;
+                  await next();
+            }
+
+
+
+
             socket.broadcast.to(message.conversationId).emit('newMessage', {text,
                 room:message.conversationId,
                 userId:decodedToken.payload.trader
@@ -30,7 +48,7 @@ module.exports=function(io){
                 status:1,
                 message:'message delivered',
                 text,
-                userId:decodedToken.payload.trader
+                userId:ctx.state.trader
 
             }});
     

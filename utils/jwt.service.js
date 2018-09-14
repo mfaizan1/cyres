@@ -8,7 +8,7 @@ module.exports={
         })
     },verify(token){
         try{
-        console.log(jwt.verify(token,config.development.secret));
+        // console.log(jwt.verify(token,config.development.secret));
         return jwt.verify(token,config.development.secret);
     }catch(err){
         return false;
