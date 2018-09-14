@@ -178,7 +178,6 @@ module.exports={
     async addCurrency(ctx){
     
         return ctx.db.sequelize.transaction(function (t) {
-
             // chain all your queries here. make sure you return them.
             return  ctx.db.supportedTokens.create({
                 name : ctx.request.body.name,

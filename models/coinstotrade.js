@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
 
     active: {
       type:DataTypes.BOOLEAN,
-      default:'true'
+      default:'true',
+      
     },
     delete:{
       type:DataTypes.BOOLEAN,
@@ -34,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   coinsToTrade.associate = function(models) {
     coinsToTrade.hasMany(models.localTrade);
+    coinsToTrade.hasMany(models.escrow);
     };
   return coinsToTrade;
 };

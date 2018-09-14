@@ -68,7 +68,8 @@ traders.associate = (models)=>{
   traders.belongsToMany(models.supportedTokens,{
     through:'Wallets'
   });
-  traders.belongsToMany(traders, { as: 'heldBy', through: 'escrow' })
+  traders.hasMany(models.escrow, {as: 'holder',foreignKey : 'heldById'});
+  traders.hasMany(models.escrow, {as: 'giver',foreignKey : 'traderId'});
 }
   return traders;
 };

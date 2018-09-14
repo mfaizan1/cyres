@@ -46,7 +46,7 @@ async signup(ctx){
 
         };
           }else {
-            
+
             // const allTokens =  ctx.db.supportedTokens.findAll();
             // Object.keys(allTokens).forEach(function(key){
             //      ctx.db.Wallets.create({
@@ -144,7 +144,8 @@ async login(ctx){
            }
           const token =  JwtServices.issue({
              payload:{
-                  trader:trader.id
+                  trader:trader.id,
+                  role:'trader'
           }
         },'3h');
 
