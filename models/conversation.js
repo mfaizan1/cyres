@@ -1,7 +1,10 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var conversation = sequelize.define('conversation', {
-    deleted: DataTypes.BOOLEAN
+    deleted:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    }
   }, {});
   conversation.associate = function(models) {
 
