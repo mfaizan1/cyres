@@ -87,7 +87,7 @@ module.exports={
       }
       ,
 async findConversations(ctx){
-
+    console.log("trader"+ctx.state.trader)
     const conToSearch = [];
     const conToSend=[];
         const conversations = await ctx.db.conversation.findAll({
@@ -96,11 +96,8 @@ async findConversations(ctx){
             [Op.or]: [{userOneId: ctx.state.trader},{userTwoId:ctx.state.trader}]
         }
         });
-        console.log(conversations);
-
     for (var key in conversations) {
         if (conversations.hasOwnProperty(key)) {
-           console.log(conversations[key].userOneId , conversations[key].userTwoId);
            if(conversations[key].userOneId == ctx.state.trader){
             // conToSearch.push(conversations[key].userTwoId );
             conToSearch.push({user:conversations[key].userTwoId , conversationId:conversations[key].id})
@@ -111,8 +108,8 @@ async findConversations(ctx){
            }
         }
      }
+     console.log("cons to search",conToSearch)
      for (var key in conToSearch) {
-         console.log("s"+ conToSearch[key].user +" "+conToSearch[key].conversationId);
          await ctx.db.sequelize.query('select  "traders"."name" , "conversations"."id" as "conversationId" , "messages"."createdAt" \
           from public.traders \
          join "conversations" on "traders"."id" = "conversations"."userOneId" \
