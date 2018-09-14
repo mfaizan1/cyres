@@ -42,7 +42,7 @@ module.exports=function(io){
                 status:1,
                 message:'message delivered',
                 text,
-                userId:ctx.state.trader
+                userId:decodedToken.payload.trader
 
             }});
     
