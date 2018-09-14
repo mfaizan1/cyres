@@ -21,7 +21,6 @@ module.exports=function(io){
             text=message.message;
       
             const decodedToken = JwtService.verify(message.token);
-            const decodedToken = JwtService.verify(token);
             if(!decodedToken) {
                return ctx.body={
                     authorization:{
