@@ -22,7 +22,8 @@ module.exports=function(io){
       
             const decodedToken = JwtService.verify(message.token);
             socket.broadcast.to(message.conversationId).emit('newMessage', {text,
-                room:message.conversationId
+                room:message.conversationId,
+                userId:decodedToken.payload.trader
                   }
             ); 
             callback({messagesent:{
