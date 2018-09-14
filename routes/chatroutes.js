@@ -22,14 +22,15 @@ module.exports=function(io){
       
             const decodedToken = JwtService.verify(message.token);
             socket.broadcast.to(message.conversationId).emit('newMessage', {text,
-                room:message.conversationId,
-                userId:decodedToken.payload.trader
+                room:message.conversationId
                   }
             ); 
             callback({messagesent:{
                 status:1,
                 message:'message delivered',
-                text
+                text,
+                userId:decodedToken.payload.trader
+
             }});
     
           });
