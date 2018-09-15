@@ -198,7 +198,7 @@ async insertMessage(ctx){
             // chain all your queries here. make sure you return them.
             return ctx.db.messages.create({
                 type:ctx.request.body.type,
-                data:ctx.request.body.data,
+                data:ctx.request.body.message,
                 conversationId:ctx.request.body.conversationId,
                 senderId: ctx.state.trader,
                 recieverId:reciver
