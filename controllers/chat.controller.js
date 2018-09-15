@@ -219,7 +219,7 @@ async insertMessage(ctx){
               messageSend.status = 1;
               messageSend.sender=sender.name;
               messageSend.type=ctx.request.body.type;
-              messageSend.data=ctx.request.body.messages;
+              messageSend.data=ctx.request.body.message;
               messageSend.conversationId=ctx.request.body.conversationId;
               messageSend.senderId=ctx.state.trader;
               messageSend.reciverId=reciver;
