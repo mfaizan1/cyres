@@ -81,6 +81,7 @@ module.exports={
       async prevMessages(ctx){
 
         ctx.body = await ctx.db.messages.findAll({
+            attributes:['type',['data','message'],'createdAt','senderId'],
             where:{
                 conversationId:ctx.request.body.conversationId
             }
@@ -234,29 +235,6 @@ async insertMessage(ctx){
             // Transaction has been rolled back
             // err is whatever rejected the promise chain returned to the transaction callback
           });
-
-
-
-//             const message =  await ctx.db.messages.create({
-//             type:ctx.request.body.type,
-//             data:ctx.request.body.text,
-//             conversationId:ctx.request.body.conversationId,
-//             senderId: ctx.state.trader,
-//             recieverId:reciver
-//         });
-//         if(message){
-//             console.log(message);
-//         ctx.body={messagesave:{
-//          status:1,
-//         message:"message saved",
-//         text:ctx.request.body.message
-// }}
-//         }
-//     }else {
-//         ctx.body={messagesave:{
-//             status:0,
-//             message:"wrong credentials"
-//         }}
     }
 }catch(err)
 {
