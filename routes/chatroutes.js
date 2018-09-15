@@ -17,32 +17,30 @@ module.exports=function(io){
 
         let text='';
         socket.on('createMessage', (message,callback) => {
-            console.log(message);
-            text=message.message;
-      
-            const decodedToken = JwtService.verify(message.token);
-            if(!decodedToken) {
-               return ctx.body={
-                    authorization:{
-                        status : 0,
-                        message:"token expired or malformed."
-                    }
-                }
-            }
+            console.log("message:",message.data.data);
+            text=message.data.data
+            // const decodedToken = JwtService.verify(message.token);
+            // if(!decodedToken) {
+            //    return ctx.body={
+            //         authorization:{
+            //             status : 0,
+            //             message:"token expired or malformed."
+            //         }
+            //     }
+            // }
 
-
-
-
-            socket.broadcast.to(message.conversationId).emit('newMessage', {text,
-                room:message.conversationId,
-                userId:decodedToken.payload.trader
+            socket.broadcast.to(message.data.conversationId).emit('newMessage', {text,
+                room:message.data.conversationId,
+                sender:message.data.sender,
+                type:message.data.type,
+                message:message.data.data
                   }
             ); 
             callback({messagesent:{
                 status:1,
                 message:'message delivered',
-                text,
-                userId:decodedToken.payload.trader
+                text
+                
 
             }});
     

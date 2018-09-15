@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const aws = require("./../utils/uploadAws");
-var shortid = require('shortid');
+const shortid = require('shortid');
+const chatsocket =  require("./../routes/chatroutes");
 
 module.exports={
     async sendImage(ctx){
@@ -180,6 +181,8 @@ async createOrFindConversation(ctx){
 },
 async insertMessage(ctx){
     try{
+
+        let messageSend = {} 
     const conversation = await ctx.db.conversation.findOne({where:{
         id : ctx.request.body.conversationId
     }});
@@ -190,25 +193,70 @@ async insertMessage(ctx){
         }else{
             reciver=conversation.userOneId;
         }
-            const message =  await ctx.db.messages.create({
-            type:ctx.request.body.type,
-            data:ctx.request.body.message,
-            conversationId:ctx.request.body.conversationId,
-            senderId: ctx.state.trader,
-            recieverId:reciver
-        });
-        if(message){
-        ctx.body={messagesave:{
-         status:1,
-        message:"message saved",
-        text:ctx.request.body.message
-}}
-        }
-    }else {
-        ctx.body={messagesave:{
-            status:0,
-            message:"wrong credentials"
-        }}
+        return ctx.db.sequelize.transaction(function (t) {
+
+            // chain all your queries here. make sure you return them.
+            return ctx.db.messages.create({
+                type:ctx.request.body.type,
+                data:ctx.request.body.text,
+                conversationId:ctx.request.body.conversationId,
+                senderId: ctx.state.trader,
+                recieverId:reciver
+            }, {transaction: t})
+            .then(function (message) {
+                // messageSend.status=1
+                // messageSend.type= message.type;
+                // messageSend.message=message.data;
+                // messageSend.conversationId.conversationId;
+                return ctx.db.traders.findOne(
+                    {   attributes:['name'],
+                        where:{
+                    id:message.senderId
+                }},{transaction:t})
+            });
+          }).then(function (sender) {
+              console.log(sender.name);
+              messageSend.status = 1;
+              messageSend.sender=sender.name;
+              messageSend.type=ctx.request.body.type;
+              messageSend.data=ctx.request.body.text;
+              messageSend.conversationId=ctx.request.body.conversationId;
+              messageSend.senderId=ctx.state.trader;
+              messageSend.reciverId=reciver;
+                ctx.body = messageSend;
+          }).catch(function (err) {
+                ctx.body = {
+                    messageSend:{
+                        status:0,
+                        message:"couldn't send message"
+                    }
+                }
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+          });
+
+
+
+//             const message =  await ctx.db.messages.create({
+//             type:ctx.request.body.type,
+//             data:ctx.request.body.text,
+//             conversationId:ctx.request.body.conversationId,
+//             senderId: ctx.state.trader,
+//             recieverId:reciver
+//         });
+//         if(message){
+//             console.log(message);
+//         ctx.body={messagesave:{
+//          status:1,
+//         message:"message saved",
+//         text:ctx.request.body.message
+// }}
+//         }
+//     }else {
+//         ctx.body={messagesave:{
+//             status:0,
+//             message:"wrong credentials"
+//         }}
     }
 }catch(err)
 {
