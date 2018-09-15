@@ -17,7 +17,7 @@ module.exports=function(io){
 
         let text='';
         socket.on('createMessage', (message,callback) => {
-            console.log("message:",message.data.data);
+            console.log("message:",message.data);
             text=message.data.data
             // const decodedToken = JwtService.verify(message.token);
             // if(!decodedToken) {

@@ -198,7 +198,7 @@ async insertMessage(ctx){
             // chain all your queries here. make sure you return them.
             return ctx.db.messages.create({
                 type:ctx.request.body.type,
-                data:ctx.request.body.text,
+                data:ctx.request.body.data,
                 conversationId:ctx.request.body.conversationId,
                 senderId: ctx.state.trader,
                 recieverId:reciver
@@ -219,7 +219,7 @@ async insertMessage(ctx){
               messageSend.status = 1;
               messageSend.sender=sender.name;
               messageSend.type=ctx.request.body.type;
-              messageSend.data=ctx.request.body.text;
+              messageSend.data=ctx.request.body.data;
               messageSend.conversationId=ctx.request.body.conversationId;
               messageSend.senderId=ctx.state.trader;
               messageSend.reciverId=reciver;
