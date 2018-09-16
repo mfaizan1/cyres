@@ -83,6 +83,7 @@ module.exports={
       async prevMessages(ctx){
 
         ctx.body = await ctx.db.messages.findAll({
+ 
             attributes:['type',['data','message'],'createdAt','senderId'],
             where:{
                 conversationId:ctx.request.body.conversationId
@@ -222,7 +223,7 @@ async insertMessage(ctx){
               messageSend.status = 1;
               messageSend.sender=sender.name;
               messageSend.type=ctx.request.body.type;
-              messageSend.data=ctx.request.body.message;
+              messageSend.message=ctx.request.body.message;
               messageSend.conversationId=ctx.request.body.conversationId;
               messageSend.senderId=ctx.state.trader;
               messageSend.reciverId=reciver;

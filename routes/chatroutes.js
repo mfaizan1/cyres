@@ -50,8 +50,7 @@ module.exports=function(io){
       
     
             socket.broadcast.to(message.conversationId).emit('newImage', {
-                message:message.url
-                ,
+                message:message.url ,
                 room:message.conversationId,
                 type:message.type,
                 sender:message.sender,

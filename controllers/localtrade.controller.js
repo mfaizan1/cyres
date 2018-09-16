@@ -291,9 +291,7 @@ if (details){
     }
 },
 async initiateBuyTrade(ctx){
-
     try{
-
         return ctx.db.sequelize.transaction(function (t) {
             console.log("here");
             // chain all your queries here. make sure you return them.
