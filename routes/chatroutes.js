@@ -33,7 +33,7 @@ module.exports=function(io){
                 room:message.data.conversationId,
                 sender:message.data.sender,
                 type:message.data.type,
-                message:message.data.data
+                message:message.data.message
                   }
             ); 
             callback({messagesent:{
