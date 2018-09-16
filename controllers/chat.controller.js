@@ -45,7 +45,7 @@ module.exports={
             {   attributes:['name'],
                 where:{
             id:message.senderId
-        }},{transaction:t})
+        }})
         if(message){
        return ctx.body={imagesend:{
         status:1,
