@@ -50,9 +50,15 @@ module.exports=function(io){
       
     
             socket.broadcast.to(message.conversationId).emit('newImage', {
-                url:message.url
+                message:message.url
                 ,
-                room:message.conversationId,    }
+                room:message.conversationId,
+                type:message.type,
+                sender:message.sender,
+
+            
+            
+            }
             ); 
             callback({messagesent:{
                 status:1,

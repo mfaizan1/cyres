@@ -12,7 +12,7 @@ module.exports={
             const { key, url }    = await  aws.uploadFile({
               filePath:files.file.path,
               fileType:files.file.type,
-              key:`onversations/${body.conversationId}/${shortid.generate()}`
+              key:`conversations/${body.conversationId}/${shortid.generate()}`
           });
           console.log(key,url);
             if (key==0 && url == 0){
