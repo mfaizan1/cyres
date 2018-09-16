@@ -41,23 +41,25 @@ module.exports={
             senderId: ctx.state.trader,
             recieverId:reciver
         });
+       const sender = ctx.db.traders.findOne(
+            {   attributes:['name'],
+                where:{
+            id:message.senderId
+        }},{transaction:t})
         if(message){
        return ctx.body={imagesend:{
         status:1,
-        message:"image saved",
-        data:message.data,
-        type:'image',
+        statusMessage:"image saved",
+        message:message.data,
+        sender:sender.name,
+        type:'image'
 }}
         }else{
             return ctx.body={imagesend:{
                 status:0,
                 message:"can't save in databse",
-                data:message.data,
-                type:'image',
         }}
         }
-
-  
             }
         }
             }else{
