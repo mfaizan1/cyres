@@ -82,13 +82,26 @@ module.exports={
       },
       async prevMessages(ctx){
 
-        ctx.body = await ctx.db.messages.findAll({
+
+
+        await ctx.db.sequelize.query('select "messages"."type" , "messages"."data" as "message" ,"messages"."createdAt", "traders"."name" as "sender" \
+        from "messages" join "traders" on "messages"."senderId" = "traders"."id" \
+        where "messages"."conversationId" = :conversationId \
+        order by "messages"."createdAt" ASC', {replacements: { 
+            conversationId: ctx.request.body.conversationId,
+            
+         }, type: ctx.db.sequelize.QueryTypes.SELECT})
+  .then(messages => {
+      ctx.body = messages;
+  })
+
+        // ctx.body = await ctx.db.messages.findAll({
        
-            attributes:['type',['data','message'],'createdAt',['senderId','sender']],
-            where:{
-                conversationId:ctx.request.body.conversationId
-            }
-        })
+        //     attributes:['type',['data','message'],'createdAt',['senderId','sender']],
+        //     where:{
+        //         conversationId:ctx.request.body.conversationId
+        //     }
+        // })
       }
       ,
 async findConversations(ctx){
