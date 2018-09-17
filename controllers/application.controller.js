@@ -6,7 +6,7 @@ module.exports = {
 
 async submitApplication(ctx){
     let {body, files} = ctx.request;
-    console.log(files);
+    console.log("files",files);
         try{
         if ('POST' != ctx.method) return await next();
 
@@ -70,23 +70,7 @@ if(previousApplication!==null){
                     });
                 }
 
-                // for (var key in files) {
-                //     var item = files[key];
-                //     console.log("hey"+files[key])
-                //     const { key, url } = await  aws.uploadFile({
-                //         filePath: files[key].path,
-                //         fileType: files[key].path,
-                //         key: `applications/${trader.id}/${application.id}/${shortid.generate()}`,
-                //     });
-
-                //     ctx.db.applicationPictures.create({
-                //         path: url,
-                //         verificationApplicationId: application.id
-                //     });
-          
-                }
-        
-            // }
+    
 ctx.body = {verificationApplication:{
     status:1,
     message:"Application submitted successfully"
