@@ -305,7 +305,7 @@ try{
             }
         }
     },async withdraws(ctx){
-        ctx.body = await ctx.db.withdraws.findAll({
+        ctx.body = await ctx.db.Withdraws.findAll({
             where:{
                 adminApproved:false
             }

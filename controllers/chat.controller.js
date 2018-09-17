@@ -95,13 +95,6 @@ module.exports={
       ctx.body = messages;
   })
 
-        // ctx.body = await ctx.db.messages.findAll({
-       
-        //     attributes:['type',['data','message'],'createdAt',['senderId','sender']],
-        //     where:{
-        //         conversationId:ctx.request.body.conversationId
-        //     }
-        // })
       }
       ,
 async findConversations(ctx){
