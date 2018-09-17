@@ -44,6 +44,8 @@ router.post('/admin/application',isAuthenticatedAdmin,adminController.applicatio
 router.post('/admin/approveApplication',isAuthenticatedAdmin,adminController.approveApplication);
 router.post('/admin/rejectApplication',isAuthenticatedAdmin,adminController.rejectApplication);
 router.get('/admin/withdraws',isAuthenticatedAdmin,adminController.withdraws);
+router.post('/admin/approveWithdraw',isAuthenticatedAdmin,adminController.approveWithdraw);
+router.post('/admin/rejectWithdraw',isAuthenticatedAdmin,adminController.rejectWithdraw);
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);

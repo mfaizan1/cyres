@@ -351,7 +351,7 @@ try{
 
 
         
-    },async rejectwithDraw(ctx){
+    },async rejectWithdraw(ctx){
         try{
             const update =  await ctx.db.Withdraws.update({
                 adminApproved:true
