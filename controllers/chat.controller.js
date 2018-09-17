@@ -84,7 +84,7 @@ module.exports={
 
         ctx.body = await ctx.db.messages.findAll({
        
-            attributes:['type',['data','message'],'createdAt','senderId'],
+            attributes:['type',['data','message'],'createdAt',['senderId','senderName'],
             where:{
                 conversationId:ctx.request.body.conversationId
             }
