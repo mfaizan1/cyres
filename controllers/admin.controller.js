@@ -228,8 +228,7 @@ module.exports={
     },
     async application(ctx){
 
-
-        await ctx.db.sequelize.query('select * from "verificationApplications" join "applicationPictures" on "verificationApplications"."id" = "applicationPictures"."verificationApplicationId" where "verificationApplications"."id" = 1',{replacements:{
+        await ctx.db.sequelize.query('select * from "verificationApplications" join "applicationPictures" on "verificationApplications"."id" = "applicationPictures"."verificationApplicationId" where "verificationApplications"."id" = :id',{replacements:{
             id:ctx.request.body.applicationId
         },type:ctx.db.sequelize.QueryTypes.SELECT}).then(applicationdata=>{
             ctx.body=applicationdata;
@@ -322,23 +321,64 @@ try{
 
     },
     async approveWithdraw(ctx){
+        try{
+            const update =  await ctx.db.Withdraws.update({
+                adminApproved:true
+            },{
+                where:{
+                    id: ctx.request.body.withdrawId
+                }
+            })
+            if(update){
+                return ctx.body= {
+                    approveWithdraw:{
+                        status:1,
+                        message:"approved"
+                    }
+                
+                }
+            }
 
-const update =  await ctx.db.Withdraws.update({
-    adminApproved:true
-},{
-    where:{
-        id: ctx.request.body.withdrawId
-    }
-})
+        }catch(err){
+            return ctx.body= {
+                approveWithdraw:{
+                    status:0,
+                    message:"could not approve"
+                }
+            
+            }
+        }
+
+
         
     },async rejectwithDraw(ctx){
-        const update =  await ctx.db.Withdraws.update({
-            adminApproved:true
-        },{
-            where:{
-                id: ctx.request.body.withdrawId
+        try{
+            const update =  await ctx.db.Withdraws.update({
+                adminApproved:true
+            },{
+                where:{
+                    id: ctx.request.body.withdrawId
+                }
+            })
+            if(update){
+                return ctx.body= {
+                    approveWithdraw:{
+                        status:1,
+                        message:"rejected"
+                    }
+                
+                }
             }
-        })
+        }catch(err){
+            return ctx.body= {
+                approveWithdraw:{
+                    status:0,
+                    message:"could not reject"
+                }
+            
+            }
+        }
+
     }
     
 
