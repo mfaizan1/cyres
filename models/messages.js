@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     data: DataTypes.STRING
   }, {});
   messages.associate = function(models) {
-    // associations can be defined here
+    // messages.hasOne(models.traders,{as:'sender',foreignKey : 'senderId'})
   };
   return messages;
 };

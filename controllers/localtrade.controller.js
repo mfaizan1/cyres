@@ -36,7 +36,7 @@ try{
         }
     }
 }
-console.log(typeof(ctx.request.body.maxQuantity));
+
     if (ctx.request.body.tradeType==="sell"){
         const wallet = await ctx.db.Wallets.findOne({
             where :{
@@ -44,7 +44,6 @@ console.log(typeof(ctx.request.body.maxQuantity));
                 supportedTokenId:coin.id
             }
         });
-        console.log(wallet.balance);
         if(!wallet){
           return  ctx.body = {
               addcoin:{
@@ -103,7 +102,9 @@ console.log(typeof(ctx.request.body.maxQuantity));
                 paymentCurrency:ctx.request.body.paymentCurrency,
                 paymentMethod:ctx.request.body.paymentMethod,
                 traderId:ctx.state.trader,
-                supportedTokenId:coin.id
+                supportedTokenId:coin.id,
+                active:true,
+                delete:false
             });
             ctx.body = {
                 addcoin:{
@@ -160,7 +161,9 @@ console.log(typeof(ctx.request.body.maxQuantity));
 async deleteLocalTrade(ctx){
     try{
       const del = await ctx.db.coinsToTrade.update(
-          {delete:true},
+          {
+              delete:true
+            },
         {
             where:{
                 id:ctx.request.body.id,
@@ -168,7 +171,8 @@ async deleteLocalTrade(ctx){
             }
         });
         if(del){
-ctx.body = {localTradeDelete:{
+ctx.body = {
+    localTradeDelete:{
             staus:1,
             message:"Local trade details deleted successfully"
 } }
@@ -198,11 +202,14 @@ async search(ctx)
     FULL OUTER JOIN "verificationApplications" ON "traders"."id" = "verificationApplications"."traderId" \
     FULL OUTER JOIN "coinsToTrades" ON "traders"."id" = "coinsToTrades"."traderId" \
     FULL OUTER JOIN "supportedTokens" ON "coinsToTrades"."supportedTokenId" = "supportedTokens"."id" \
-    WHERE "coinsToTrades"."paymentCurrency" = :paymentCurrency \
+    WHERE \
+    "coinsToTrades"."active" = true and \
+    "coinsToTrades"."delete" = false and \
+    "coinsToTrades"."paymentCurrency" = :paymentCurrency \
     and "supportedTokens"."symbol" = :currency and \
     "coinsToTrades"."tradeType" = :tradeType and \
     "verificationApplications"."country" = :country and \
-    "traders"."id" != :currentUser',
+    "coinsToTrades"."traderId" != :currentUser',
     { replacements: { 
         paymentCurrency: ctx.request.body.paymentCurrency,
         currency:ctx.request.body.currency,
@@ -292,8 +299,76 @@ if (details){
 },
 async initiateBuyTrade(ctx){
     try{
+
+
+        const sellerWallet = await ctx.db.Wallets.findOne({
+            where:{
+                traderId:ctx.request.body.traderId,
+                supportedTokenId:ctx.request.body.tokenId
+            }
+        });
+        const coinTotrade = await ctx.db.coinsToTrade.findOne({
+            where:{
+                id: ctx.request.body.coinsToTradeId
+            }
+        })
+    console.log("ctt",coinTotrade);
+        console.log(sellerWallet.balance - parseFloat(ctx.request.ctx.request.body.quantity));
+        if(sellerWallet.balance - parseFloat(ctx.request.ctx.request.body.quantity)<coinTotrade.maxQuantity){
+            console.log("if part");
+            return ctx.db.sequelize.transaction(function (t) {
+                // chain all your queries here. make sure you return them.
+                return ctx.db.localTrade.create({
+                    quantity: ctx.request.body.quantity,
+                      traderId: ctx.request.body.traderId,
+                      status:'Active',
+                      clientId: ctx.state.trader,
+                      feedbackGiven:false,
+                      supportedTokenId: ctx.request.body.tokenId,
+                      coinsToTradeId:ctx.request.body.coinsToTradeId
+                  }, {transaction: t}).then(function (localtrade) {
+                  return ctx.db.Wallets.update({
+                    balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
+                  },{where:{
+                      traderId:ctx.request.body.traderId,
+                      supportedTokenId:ctx.request.body.tokenId
+                  }}, {transaction: t}).then(function(wallet){
+                      return ctx.db.coinsToTrade.update({
+                          active:false
+                      },{
+                          where:{
+                              id:ctx.request.body.coinsToTradeId
+                          }
+                      },{transaction:t})
+                  });
+                });
+              }).then(function (Wallets) {
+                ctx.body= { buy:{
+                    status:1,
+                    message:"Buy request sent"
+                }
+            }
+                // Transaction has been committed
+                // result is whatever the result of the promise chain returned to the transaction callback
+              }).catch(function (err) {
+    
+                if(err.constructor.name==='UniqueConstraintError'){
+                    ctx.body= { buy:{
+                        status:0,
+                        message:"You cannot create two trades with same seller at same time"
+                    }
+                }
+            
+            }
+                // Transaction has been rolled back
+                // err is whatever rejected the promise chain returned to the transaction callback
+              });
+    
+
+        }else{
+
         return ctx.db.sequelize.transaction(function (t) {
-            console.log("here");
+            console.log("else part");
             // chain all your queries here. make sure you return them.
             return ctx.db.localTrade.create({
                 quantity: ctx.request.body.quantity,
@@ -303,15 +378,16 @@ async initiateBuyTrade(ctx){
                   feedbackGiven:false,
                   supportedTokenId: ctx.request.body.tokenId,
                   coinsToTradeId:ctx.request.body.coinsToTradeId
-              }, {transaction: t}).then(function (escrow) {
+              }, {transaction: t}).then(function (localTrade) {
               return ctx.db.Wallets.update({
                 balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
               },{where:{
-                  traderId:ctx.request.body.traderId
+                  traderId:ctx.request.body.traderId,
+                  supportedTokenId:ctx.request.body.tokenId
               }}, {transaction: t});
             });
           }).then(function (Wallets) {
-            ctx.body= { buy:{
+           return ctx.body = { buy:{
                 status:1,
                 message:"Buy request sent"
             }
@@ -321,7 +397,7 @@ async initiateBuyTrade(ctx){
           }).catch(function (err) {
 
             if(err.constructor.name==='UniqueConstraintError'){
-                ctx.body= { buy:{
+              return  ctx.body= { buy:{
                     status:0,
                     message:"You cannot create two trades with same seller at same time"
                 }
@@ -332,10 +408,15 @@ async initiateBuyTrade(ctx){
             // err is whatever rejected the promise chain returned to the transaction callback
           });
 
+        }
+
+
+
+
 
 
     }catch(err){
-        console.log('fuck',err.constructor);
+        console.log('fuck', err);
         ctx.body= { 
             buy:{
             status:0,
@@ -662,6 +743,18 @@ async getLocaltrades(){
         }
     });
 },
+
+async sendSellRequest(){
+
+
+
+
+
+
+    
+},
+
+
 async getTradeDetails(ctx){
     ctx.body =  await ctx.db.localTrade.findOne({
         where:{

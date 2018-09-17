@@ -83,7 +83,7 @@ module.exports={
       async prevMessages(ctx){
 
         ctx.body = await ctx.db.messages.findAll({
- 
+       
             attributes:['type',['data','message'],'createdAt','senderId'],
             where:{
                 conversationId:ctx.request.body.conversationId

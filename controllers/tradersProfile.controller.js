@@ -106,7 +106,9 @@ async login(ctx){
           }
         }
         else if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
+            console.log("token "+ ctx.request.body.token)
            tokenVerifed = twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)
+
            if(!tokenVerifed)
            {
           return  ctx.body =  {login:{
@@ -151,6 +153,7 @@ async login(ctx){
 
         let message = `Signin successful${additionalMessage}`
 
+        console.log("issue token "+token);
         ctx.body={signin:{
             status:1,
             message,
