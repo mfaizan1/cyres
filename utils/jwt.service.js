@@ -7,6 +7,7 @@ module.exports={
             expiresIn:expiresIn
         })
     },verify(token){
+        console.log("verifying token "+token)
         try{
         // console.log(jwt.verify(token,config.development.secret));
         return jwt.verify(token,config.development.secret);

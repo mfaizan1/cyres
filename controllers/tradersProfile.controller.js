@@ -106,7 +106,7 @@ async login(ctx){
           }
         }
         else if(trader.twoFAActive && module.exports.checkParameters(ctx.request.body.token)){
-            console.log("token "+ ctx.request.body.token)
+            console.log("token incoming"+ ctx.request.body.token)
            tokenVerifed = twoFa.verifySecretKey(trader.secretKey,ctx.request.body.token)
 
            if(!tokenVerifed)
