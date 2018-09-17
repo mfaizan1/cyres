@@ -227,11 +227,20 @@ module.exports={
         });
     },
     async application(ctx){
-        ctx.body =  await ctx.db.verificationApplication.findOne({
-            where:{
-                id:ctx.request.body.applicationId
-            }
-        })
+
+
+        await ctx.db.sequelize.query('select * from "verificationApplications" join "applicationPictures" on "verificationApplications"."id" = "applicationPictures"."verificationApplicationId" where "verificationApplications"."id" = 1',{replacements:{
+            id:ctx.request.body.applicationId
+        },type:ctx.db.sequelize.QueryTypes.SELECT}).then(applicationdata=>{
+            ctx.body=applicationdata;
+        });
+
+
+        // ctx.body =  await ctx.db.verificationApplication.findOne({
+        //     where:{
+        //         id:ctx.request.body.applicationId
+        //     }
+        // })
     },
     async approveApplication(ctx){
 
@@ -311,6 +320,25 @@ try{
             }
         })
 
+    },
+    async approveWithdraw(ctx){
+
+const update =  await ctx.db.Withdraws.update({
+    adminApproved:true
+},{
+    where:{
+        id: ctx.request.body.withdrawId
+    }
+})
+        
+    },async rejectwithDraw(ctx){
+        const update =  await ctx.db.Withdraws.update({
+            adminApproved:true
+        },{
+            where:{
+                id: ctx.request.body.withdrawId
+            }
+        })
     }
     
 
