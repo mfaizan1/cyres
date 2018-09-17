@@ -6,6 +6,7 @@ module.exports = {
 
 async submitApplication(ctx){
     let {body, files} = ctx.request;
+    console.log(files);
         try{
         if ('POST' != ctx.method) return await next();
 
