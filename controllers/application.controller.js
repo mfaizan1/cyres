@@ -71,6 +71,8 @@ if(previousApplication!==null){
                 }
 
     
+                }
+  
 ctx.body = {verificationApplication:{
     status:1,
     message:"Application submitted successfully"
