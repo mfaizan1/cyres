@@ -504,7 +504,8 @@ async cancelTrade(ctx){
                 id: localtrader.coinsToTradeId
             }
         })
-    if (sellerWallet.balance+localtrade.quantity>coinsToTrade.maxQuantity){
+    if (sellerWallet.balance+localtrade.quantity>coinToTrade.maxQuantity){
+        console.log("if part")
         return ctx.db.sequelize.transaction(function (t) {
             // chain all your queries here. make sure you return them.
             return ctx.db.localTrade.update({
@@ -558,6 +559,7 @@ async cancelTrade(ctx){
           });
 
     }else{
+        console.log("if part")
         return ctx.db.sequelize.transaction(function (t) {
             // chain all your queries here. make sure you return them.
             return ctx.db.localTrade.update({
