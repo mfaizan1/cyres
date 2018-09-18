@@ -501,7 +501,7 @@ async cancelTrade(ctx){
         });
         const coinTotrade = await ctx.db.coinsToTrade.findOne({
             where:{
-                id: localtrader.coinsToTradeId
+                id: localtrade.coinsToTradeId
             }
         })
     if (sellerWallet.balance+localtrade.quantity > coinToTrade.maxQuantity){
