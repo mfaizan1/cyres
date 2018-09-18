@@ -489,7 +489,7 @@ async cancelTrade(ctx){
         
         const localtrade =  await ctx.db.localTrade.findOne({
             where :{
-                id:ctx.request.body.tradeId
+                id:ctx.request.body.localTradeId
             }
         });
 
