@@ -611,6 +611,7 @@ async cancelTrade(ctx){
 
 
     }catch(err){
+        console.log(err)
         ctx.body= { 
             buyCancel:{
             status:0,
