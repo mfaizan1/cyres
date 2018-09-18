@@ -6,7 +6,6 @@ module.exports = {
 
 async submitApplication(ctx){
     let {body, files} = ctx.request;
-    console.log("files",files);
         try{
         if ('POST' != ctx.method) return await next();
 
@@ -52,12 +51,10 @@ if(previousApplication!==null){
                         id: ctx.state.trader
                     }
                 });
-        
-                const files = ctx.request.files;
+
                 for (var KeyVal in files) {
                     var item = files[KeyVal];
-                    console.log(`item : ${item}`)
-            
+                    console.log('item ',item)
                     const { key, url } = await  aws.uploadFile({
                         filePath: item.path,
                         fileType: item.path,
