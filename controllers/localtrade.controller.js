@@ -299,6 +299,7 @@ if (details){
 },
 async initiateBuyTrade(ctx){
     try{
+        console.log(ctx.request.body );
 
 
         const sellerWallet = await ctx.db.Wallets.findOne({
