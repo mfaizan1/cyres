@@ -242,7 +242,7 @@ async tradePage(ctx){
                 supportedTokenId:ctx.request.body.tokkenId,
                 traderId:ctx.request.body.traderId
             }
-        })
+        });
         console.log("ctx.body "+already_active);
         if (already_active){
             return ctx.body={ tradePage:{
@@ -300,7 +300,23 @@ if (details){
 async initiateBuyTrade(ctx){
     try{
         console.log(ctx.request.body );
-
+        const already_active= await ctx.db.localTrade.findOne({
+            where:{
+                status:"Active",
+                clientId:ctx.state.trader,
+                supportedTokenId:ctx.request.body.tokenId,
+                traderId:ctx.request.body.traderId
+            }
+        });
+        console.log("already active"+already_active);
+        if (already_active){
+            return ctx.body={ tradePage:{
+                status:0,
+                message:"already initiated",
+                tradeId:already_active.id,
+            }
+            }
+        }
 
         const sellerWallet = await ctx.db.Wallets.findOne({
             where:{
@@ -312,8 +328,9 @@ async initiateBuyTrade(ctx){
             where:{
                 id: ctx.request.body.coinsToTradeId
             }
+
         })
-    console.log("ctt",coinTotrade);
+
         console.log(sellerWallet.balance - parseFloat(ctx.request.ctx.request.body.quantity));
         if(sellerWallet.balance - parseFloat(ctx.request.ctx.request.body.quantity)<coinTotrade.maxQuantity){
             console.log("if part");
@@ -410,12 +427,6 @@ async initiateBuyTrade(ctx){
           });
 
         }
-
-
-
-
-
-
     }catch(err){
         console.log('fuck', err);
         ctx.body= { 
@@ -514,7 +525,6 @@ async cancelTrade(ctx){
                 id:ctx.request.body.localTradeId,
                 clientId:ctx.state.trader
             }}, {transaction: t}).then(function (localTrade){
-         
                     return ctx.db.localTrade.findOne({
                         where:{
                             id:ctx.request.body.localTradeId,
@@ -522,23 +532,22 @@ async cancelTrade(ctx){
                             status:"Cancelled"
                         }
                     })
-                
-            }).then(function (localTrade) {
+            },{transaction:t}).then(function (localTrade) {
                 console.log("local trade is returning"+localTrade);
               return ctx.db.Wallets.update({
                 balance: Sequelize.literal(`balance + ${localTrade.quantity}`)
               },{where:{
                   traderId:localTrade.traderId
-              }}, {transaction: t}).then(function(wallet){
+              }}, {transaction: t}).then(function (wallet){
                 return ctx.db.coinsToTrade.update({
                     active:true
                 },{
                     where:{
                         id:localtrade.coinsToTradeId
                     }
-                },{transaction:t})
-            });;
-            })
+                },{transaction: t});
+            });
+            });
           }).then(function (Wallets) {
             ctx.body= { buyCancel:{
                 status:1,
@@ -844,16 +853,14 @@ async getTradeDetails(ctx){
         where:{
             id:ctx.request.body.localTradeId,
             [Op.or]: [{clientId: ctx.state.trader},{traderId:ctx.state.trader}]
-        }
+        },
+        raw:true
         })
-        console.log(tradedetails)
+        let time = Date.parse(tradedetails.createdAt)+10800000;
+        tradedetails.deadline = time;
+        console.log(tradedetails);
     ctx.body =  tradedetails;
 }
-
-
-
-    
-
 };
 
 
