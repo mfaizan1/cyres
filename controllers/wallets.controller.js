@@ -34,7 +34,8 @@ try{
 ctx.body = {
     addressavailable: {
         "status": 1,
-        "address": wallet.address
+        "address": wallet.address,
+        "balance":wallet.balance
     }
 }
 }catch(err){
