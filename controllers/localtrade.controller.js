@@ -320,7 +320,7 @@ async initiateBuyTrade(ctx){
             return ctx.db.sequelize.transaction(function (t) {
                 // chain all your queries here. make sure you return them.
                 return ctx.db.localTrade.create({
-                    quantity: ctx.request.body.quantity,
+                     quantity: ctx.request.body.quantity,
                       traderId: ctx.request.body.traderId,
                       status:'Active',
                       clientId: ctx.state.trader,
@@ -757,12 +757,16 @@ async sendSellRequest(){
 
 
 async getTradeDetails(ctx){
-    ctx.body =  await ctx.db.localTrade.findOne({
+
+
+    const tradedetails= await ctx.db.localTrade.findOne({
         where:{
             id:ctx.request.body.localTradeId,
             [Op.or]: [{clientId: ctx.state.trader},{traderId:ctx.state.trader}]
         }
         })
+        console.log(tradedetails)
+    ctx.body =  tradedetails;
 }
 
 
