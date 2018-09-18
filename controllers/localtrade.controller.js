@@ -496,7 +496,7 @@ async cancelTrade(ctx){
         const sellerWallet = await ctx.db.Wallets.findOne({
             where:{
                 traderId:localtrade.traderId,
-                supportedTokenId:localTrade.supportedTokenId
+                supportedTokenId:localtrade.supportedTokenId
             }
         });
         const coinTotrade = await ctx.db.coinsToTrade.findOne({
@@ -504,7 +504,7 @@ async cancelTrade(ctx){
                 id: localtrader.coinsToTradeId
             }
         })
-    if (sellerWallet.balance+localtrade.quantity>coinToTrade.maxQuantity){
+    if (sellerWallet.balance+localtrade.quantity > coinToTrade.maxQuantity){
         console.log("if part")
         return ctx.db.sequelize.transaction(function (t) {
             // chain all your queries here. make sure you return them.
