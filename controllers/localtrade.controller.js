@@ -499,7 +499,7 @@ async cancelTrade(ctx){
                 supportedTokenId:localtrade.supportedTokenId
             }
         });
-        const coinTotrade = await ctx.db.coinsToTrade.findOne({
+        const coinToTrade = await ctx.db.coinsToTrade.findOne({
             where:{
                 id: localtrade.coinsToTradeId
             }
