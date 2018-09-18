@@ -484,6 +484,80 @@ async localTrade(ctx){
 async cancelTrade(ctx){
 
     try{
+
+
+        
+        const localtrade =  await ctx.db.localTrade.findOne({
+            where :{
+                id:ctx.request.body.tradeId
+            }
+        });
+
+        const sellerWallet = await ctx.db.Wallets.findOne({
+            where:{
+                traderId:localtrade.traderId,
+                supportedTokenId:localTrade.supportedTokenId
+            }
+        });
+        const coinTotrade = await ctx.db.coinsToTrade.findOne({
+            where:{
+                id: localtrader.coinsToTradeId
+            }
+        })
+    if (sellerWallet.balance+localtrade.quantity>coinsToTrade.maxQuantity){
+        return ctx.db.sequelize.transaction(function (t) {
+            // chain all your queries here. make sure you return them.
+            return ctx.db.localTrade.update({
+                  status:'Cancelled'
+              },{where:{
+                id:ctx.request.body.localTradeId,
+                clientId:ctx.state.trader
+            }}, {transaction: t}).then(function (localTrade){
+         
+                    return ctx.db.localTrade.findOne({
+                        where:{
+                            id:ctx.request.body.localTradeId,
+                            clientId:ctx.state.trader,
+                            status:"Cancelled"
+                        }
+                    })
+                
+            }).then(function (localTrade) {
+                console.log("local trade is returning"+localTrade);
+              return ctx.db.Wallets.update({
+                balance: Sequelize.literal(`balance + ${localTrade.quantity}`)
+              },{where:{
+                  traderId:localTrade.traderId
+              }}, {transaction: t}).then(function(wallet){
+                return ctx.db.coinsToTrade.update({
+                    active:true
+                },{
+                    where:{
+                        id:localtrade.coinsToTradeId
+                    }
+                },{transaction:t})
+            });;
+            })
+          }).then(function (Wallets) {
+            ctx.body= { buyCancel:{
+                status:1,
+                message:"Buy request cancelled"
+            }
+        }
+            // Transaction has been committed
+            // result is whatever the result of the promise chain returned to the transaction callback
+          }).catch(function (err) {
+              console.log(err);
+              ctx.body= { buyCancel:{
+                status:0,
+                message:"Something gone wrong"
+            }
+        }
+            // Transaction has been rolled back
+            // err is whatever rejected the promise chain returned to the transaction callback
+          });
+
+    }else{
         return ctx.db.sequelize.transaction(function (t) {
             // chain all your queries here. make sure you return them.
             return ctx.db.localTrade.update({
@@ -527,6 +601,10 @@ async cancelTrade(ctx){
             // Transaction has been rolled back
             // err is whatever rejected the promise chain returned to the transaction callback
           });
+    }
+
+
+       
 
 
 
