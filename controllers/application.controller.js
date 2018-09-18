@@ -88,10 +88,6 @@ ctx.body = {verificationApplication:{
     message:"some problem happend please try again"
 }
 }
-
 }
-
-//match
 }
-
 }

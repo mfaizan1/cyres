@@ -25,7 +25,7 @@ try{
     }
   
    const wallet =await ctx.db.Wallets.findOne({
-        attributes:['address'],
+        attributes:['address','balance'],
         where:{
             supportedTokenId:coin.id,
             traderId:ctx.state.trader
