@@ -65,10 +65,6 @@ traders.associate = (models)=>{
   traders.hasMany(models.conversation, {as: 'userTwo',foreignKey : 'userTwoId'});
   traders.hasMany(models.messages, {as: 'sender',foreignKey : 'senderId'});
   traders.hasMany(models.messages, {as: 'reciever',foreignKey : 'recieverId'});
-  traders.hasMany(models.orders);
-  traders.hasMany(models.addresses);
-  traders.hasMany(models.transactions);
-  
   traders.belongsToMany(models.supportedTokens,{
     through:'Wallets'
   });

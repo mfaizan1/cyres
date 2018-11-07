@@ -27,9 +27,7 @@ const server = http.createServer(app.callback());
 const io = socketio(server);
 // app.context.io = io;
 require('./routes/chatroutes')(io);
-
-
-setInterval(localtrade.getLocaltrades, 30000);
+// setInterval(localtrade.getLocaltrades, 30000);
 
 server.listen(PORT,function(){
     console.log(`listening oooon ${PORT}`);

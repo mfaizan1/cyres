@@ -3,7 +3,7 @@ const router = new Router();
 const isAuthenticated= require('./../policies/isAuthenticated');
 const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
 
-const {traderController,walletsController,applicationController,adminController,localTradeController,chatController} =  require('./../controllers');
+const {traderController,walletsController,applicationController,adminController,localTradeController,chatController,tradingController} =  require('./../controllers');
 //trader
 router.post('/signup',traderController.signup);
 router.post('/login',traderController.login);
@@ -19,20 +19,17 @@ router.post('/enable2FA',isAuthenticated,traderController.enable2FA);
 router.post('/disable2FA',isAuthenticated,traderController.disable2FA);
 router.post('/check',traderController.checkParameters);
 
-
 //wallets
 router.get('/getWallets',isAuthenticated,walletsController.getAlljoin);
 router.post('/depositCrypto',isAuthenticated,walletsController.Deposit);
 router.post('/withdraw',isAuthenticated,walletsController.withdraw);
 router.get('/hideZeroBalanceWallets',isAuthenticated,walletsController.hideZeroBalanceWallets);
+router.post('/createAddress',isAuthenticated,walletsController.createAddress);
 //verification application
-
-
-
-
 router.post('/verficationApplication',isAuthenticated,applicationController.submitApplication);
 //admin
 router.post('/addCurrency',adminController.addCurrency);
+router.post('/admin/addTradingPair',adminController.addTradingPair);
 router.post('/admin/signup',adminController.signup);
 router.post('/admin/login',adminController.login);
 router.get('/admin/viewUsers',isAuthenticatedAdmin,adminController.viewUsers);
@@ -46,6 +43,11 @@ router.post('/admin/rejectApplication',isAuthenticatedAdmin,adminController.reje
 router.get('/admin/withdraws',isAuthenticatedAdmin,adminController.withdraws);
 router.post('/admin/approveWithdraw',isAuthenticatedAdmin,adminController.approveWithdraw);
 router.post('/admin/rejectWithdraw',isAuthenticatedAdmin,adminController.rejectWithdraw);
+
+
+
+
+
 //Local Trade
 router.post('/addLocalTrade',isAuthenticated,localTradeController.addLocalTrade);
 router.post('/deleteLocalTrade',isAuthenticated,localTradeController.deleteLocalTrade);
@@ -73,5 +75,8 @@ router.get('/chat/findConversations',isAuthenticated,chatController.findConversa
 router.post('/chat/sendImage',isAuthenticated,chatController.sendImage);
 router.post('/chat/prevMessages',isAuthenticated,chatController.prevMessages);
 
+router.get('/trading/:main/:secondary',isAuthenticated,tradingController.tradingPair);
+router.post('/trading/order',isAuthenticated,tradingController.submitOrder);
+router.get('/trading/orderHistory',isAuthenticated,tradingController.orderHistory);
 
 module.exports = router;

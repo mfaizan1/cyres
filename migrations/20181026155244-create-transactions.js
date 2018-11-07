@@ -1,18 +1,24 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Wallets', {
+    return queryInterface.createTable('transactions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      address: {
+      txhash: {
         type: Sequelize.STRING
       },
-      balance: {
-        type: Sequelize.DECIMAL
+      type: {
+        type: Sequelize.STRING
+      },
+      value: {
+        type: Sequelize.DOUBLE
+      },
+      confirmations: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -25,6 +31,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Wallets');
+    return queryInterface.dropTable('transactions');
   }
 };

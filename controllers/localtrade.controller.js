@@ -454,9 +454,6 @@ async myLocalActiveTrades(ctx){
               results[key].role="seller"
             }
             }
-
-
-
             ctx.body= results;
       });
     }catch(err){
@@ -836,10 +833,6 @@ async getLocaltrades(){
 },
 
 async sendSellRequest(){
-
-
-
-
 
 
     

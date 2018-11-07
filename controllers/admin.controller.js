@@ -192,8 +192,23 @@ module.exports={
           }).then(function (result) {
               ctx.body= {addcoin:{status:1,message:"coin added"}}
            }).catch(function (err) {
+               console.log(err);
             ctx.body= {addcoin:{status:0,message:"couldn't add coin"}}
           });
+
+    },    async addTradingPair(ctx){
+    
+        try{
+            ctx.body  =  await ctx.db.tradingpairs.create({
+                status:'active',
+                mainTokenId:ctx.request.body.main,
+                secondaryTokenId:ctx.request.body.secondary
+            });
+        }
+     
+      catch(err){
+            console.log(err);
+      }
 
     },
     async viewUsers(ctx){
