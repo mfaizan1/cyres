@@ -8,7 +8,7 @@ var kafka = require('kafka-node');
 Consumer = kafka.Consumer,
 client = new kafka.Client(),
 consumer = new Consumer(client,
-    [{ topic: 'btc.eth.orderexcuted'}],
+    [{ topic: 'btc.eth.orderexecuted'}],
     {
         autoCommit: true
     }

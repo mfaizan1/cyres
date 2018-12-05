@@ -163,7 +163,7 @@ ctx.body = {
     }
 }
 }catch(err){
-
+console.log(err)
 }
 
 },async createAddress(ctx){
@@ -221,7 +221,7 @@ ctx.body = {
 
 
 }catch(err){
-    
+    console.log(err)
     }
 
 
