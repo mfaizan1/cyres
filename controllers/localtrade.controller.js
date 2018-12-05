@@ -849,8 +849,20 @@ async getTradeDetails(ctx){
         },
         raw:true
         })
+
+            if(ctx.state.trader==tradedetails.clientId){
+                tradedetails.role="buyer"
+            }
+            else {
+             
+                tradedetails.role="seller"
+                  
+            }
+
+        console.log("trade details with roles",tradedetails)
         let time = Date.parse(tradedetails.createdAt)+10800000;
         tradedetails.deadline = time;
+     
         console.log(tradedetails);
     ctx.body =  tradedetails;
 }

@@ -32,7 +32,8 @@ async signup(ctx){
             };
         }
         const hashpassword=await UtilServices.hashPassword(password);
-         await ctx.db.traders.findOrCreate({where: {email}, defaults: {name,password:hashpassword}})
+         await ctx.db.traders.findOrCreate({where: {email}, 
+            defaults: {name,password:hashpassword}})
         .spread((traders, created) => {
           console.log(traders.get({
             plain: true
