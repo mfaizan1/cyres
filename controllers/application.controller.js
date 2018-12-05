@@ -1,4 +1,5 @@
-
+const fs = require('fs');
+const path = require('path');
 const aws = require("./../utils/uploadAws");
 const shortid =  require('shortid');
 module.exports = {

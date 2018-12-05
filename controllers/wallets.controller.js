@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 Consumer = kafka.Consumer,
 client = new kafka.Client(),
 consumer = new Consumer(client,
-    [{ topic: 'address.created'},{ topic: 'btc.address.created'},{topic:"transaction"}],
+    [{ topic: 'address.created'},{topic:"transaction"}],
     {
    
         autoCommit: true
@@ -18,10 +18,6 @@ if(message.topic=="transaction"){
     module.exports.transaction(message.value);
 }else if (message.topic=="address.created"){
     module.exports.updateAddress(message.value);
-}
-else if (message.topic=="btc.address.created"){
-    // module.exports.updateAddress(message.value);
-    console.log(message.value)
 }
 });
 
@@ -57,7 +53,7 @@ async transaction(data){
     }});
     console.log("adddetails",addressDetails);
     if(addressDetails){
-
+        console.log("fuck :') ");
         return db.sequelize.transaction(function (t) {
             return db.Wallets.findOne({where:{
                 traderId:addressDetails.traderId,
@@ -97,9 +93,11 @@ async transaction(data){
 
 async updateAddress(data){
     var parsedData = JSON.parse(data);
+   
     var already_exist = await db.addresses.findOne({where:{
         traderId:parsedData.userId,
         supportedTokenId:parsedData.coinId,
+        new:true
     }});
 if (already_exist){
     return db.sequelize.transaction(function (t) {
@@ -115,7 +113,8 @@ if (already_exist){
           return db.addresses.create({
               address:parsedData.address,
               traderId:parsedData.userId,
-              supportedTokenId:parsedData.coinId
+              supportedTokenId:parsedData.coinId,
+              new:true
           }, {transaction: t})
         });
       }).then(function () {
@@ -135,7 +134,7 @@ console.log(err);
         address:parsedData.address,
         traderId:parsedData.userId,
         supportedTokenId:parsedData.coinId,
-        // new:true
+        new:true
     });
 }
 
@@ -177,7 +176,7 @@ ctx.body = {
                 symbol
             }, 
         });
-        console.log("coin",coin);
+        console.log(coin);
         const already_exist= await ctx.db.Wallets.findOne({
             where:{
                 supportedTokenId:coin.id,
@@ -192,7 +191,7 @@ ctx.body = {
             };
 
          payloads = [
-         { topic: symbol.toLowerCase()+".address.create", messages:[JSON.stringify(meta)] , partition: 0 }
+         { topic: symbol+".address.create", messages:[JSON.stringify(meta)] , partition: 0 }
                     ];
                    await producer.send(payloads, function (err, data) {
                             // ctx.body=data;
@@ -222,7 +221,6 @@ ctx.body = {
 
 
 }catch(err){
-    console.log(err)
     
     }
 

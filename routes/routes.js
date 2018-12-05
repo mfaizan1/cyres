@@ -78,11 +78,5 @@ router.post('/chat/prevMessages',isAuthenticated,chatController.prevMessages);
 router.get('/trading/:main/:secondary',isAuthenticated,tradingController.tradingPair);
 router.post('/trading/order',isAuthenticated,tradingController.submitOrder);
 router.get('/trading/orderHistory',isAuthenticated,tradingController.orderHistory);
-router.get('/trading/activeMarket',isAuthenticated,tradingController.activeMarketOrders);
-router.get('/trading/myOrders',isAuthenticated,tradingController.activeOrders);
-router.post('/trading/cancelOrder',isAuthenticated,tradingController.cancelOrder);
-router.get('/trading/completedOrders',tradingController.completedOrders);
 
-
-
-module.exports = router;    
+module.exports = router;

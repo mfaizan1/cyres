@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const aws = require("./../utils/uploadAws");
 const shortid = require('shortid');
+const chatsocket =  require("./../routes/chatroutes");
 
 module.exports={
     async sendImage(ctx){

@@ -1,12 +1,15 @@
-const { io,server} = require('./../server');
 
-
-// const ios2=require('socket.io')(server);
-
-const nsp = io.of('/chat');
-    nsp.on('connection',(socket)=>{
+// const Router = require('koa-router');
+// const router = new Router();
+// const isAuthenticated= require('./../policies/isAuthenticated');
+// const isAuthenticatedAdmin= require('./../policies/isAuthenticatedAdmin');
+    const chatcontroller =  require('./../controllers/chat.controller');
+const JwtService = require('./../utils/jwt.service');
+module.exports=function(io){
+    io.on('connection',(socket)=>{
         var query = socket.handshake.query;
         socket.join(query.roomName);
+        
         console.log("new user connected");
         socket.on('newMessage',(msg)=>{
             console.log(msg);
@@ -52,6 +55,8 @@ const nsp = io.of('/chat');
                 type:message.type,
                 sender:message.sender,
 
+            
+            
             }
             ); 
             callback({messagesent:{
@@ -64,3 +69,13 @@ const nsp = io.of('/chat');
 
 
     });   
+}
+  
+
+
+// router.get('/localtrade/chat',(ctx)=>{
+
+// });
+
+
+// module.exports = router;
