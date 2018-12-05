@@ -20,14 +20,14 @@ module.exports = {
       city: {
         type: Sequelize.STRING
       },
-      cardNumber: {
-        type: Sequelize.STRING
-      },
       status: {
+        type: Sequelize.BOOLEAN
+      },
+      phonenumber: {
         type: Sequelize.STRING
       },
-      reason: {
-        type: Sequelize.STRING
+      code: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

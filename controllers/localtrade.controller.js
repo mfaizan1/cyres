@@ -4,14 +4,30 @@ const Sequelize = require('sequelize');
 const db= require("./../models");
 const Op = Sequelize.Op;
 module.exports={
+
 async myLocalTrades(ctx){
     try{
-    ctx.body = await ctx.db.coinsToTrade.findAll({
-        where:{
-        traderId:ctx.state.trader,
-        delete:false
-    }
+
+
+ 
+
+
+await ctx.db.sequelize.query('SELECT "coinsToTrades"."id","supportedTokens"."name" ,"coinsToTrades"."minQuantity", \
+"coinsToTrades"."maxQuantity", "coinsToTrades"."pricePerTokken", "coinsToTrades"."tradeType", \
+"coinsToTrades"."paymentCurrency", "coinsToTrades"."paymentMethod", "coinsToTrades"."traderId", \
+"coinsToTrades"."active", "coinsToTrades"."delete", "coinsToTrades"."createdAt", \
+"coinsToTrades"."updatedAt" \
+FROM "coinsToTrades" \
+full outer join "supportedTokens" on "coinsToTrades"."supportedTokenId" = "supportedTokens"."id" \
+WHERE "coinsToTrades"."traderId" = :id AND "coinsToTrades"."delete" = false;',
+{ replacements: { 
+    id: ctx.state.trader
+ } }
+).spread((results, metadata) => {
+  console.log(results);
+ctx.body=results;
 });
+
     }catch(err){
         ctx.body={localtrades:{
             status:0,
@@ -173,12 +189,12 @@ async deleteLocalTrade(ctx){
         if(del){
 ctx.body = {
     localTradeDelete:{
-            staus:1,
+            status:1,
             message:"Local trade details deleted successfully"
 } }
     }else{
        ctx.body= {localTradeDelete:{
-            staus:0,
+            status:0,
             message:"No such trade details available"
 } }
     }
@@ -297,6 +313,21 @@ if (details){
         console.log(err);
     }
 },
+async reviews(ctx){
+        try{
+        
+            ctx.body = await ctx.db.feedback.findAll({
+                where:{
+                    traderId:ctx.request.body.traderId
+                }
+            })
+        }
+        catch(err){
+            console.log(err)
+            ctx.body=[];
+        }
+} 
+,
 async initiateBuyTrade(ctx){
     try{
         console.log(ctx.request.body );
@@ -346,7 +377,8 @@ async initiateBuyTrade(ctx){
                       coinsToTradeId:ctx.request.body.coinsToTradeId
                   }, {transaction: t}).then(function (localtrade) {
                   return ctx.db.Wallets.update({
-                    balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
+                    balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`),
+                    locked: Sequelize.literal(`locked + ${ctx.request.body.quantity}`)
                   },{where:{
                       traderId:ctx.request.body.traderId,
                       supportedTokenId:ctx.request.body.tokenId
@@ -398,7 +430,8 @@ async initiateBuyTrade(ctx){
                   coinsToTradeId:ctx.request.body.coinsToTradeId
               }, {transaction: t}).then(function (localTrade) {
               return ctx.db.Wallets.update({
-                balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`)
+                balance: Sequelize.literal(`balance - ${ctx.request.body.quantity}`),
+                locked: Sequelize.literal(`locked + ${ctx.request.body.quantity}`)
               },{where:{
                   traderId:ctx.request.body.traderId,
                   supportedTokenId:ctx.request.body.tokenId
@@ -448,6 +481,7 @@ async myLocalActiveTrades(ctx){
                 console.log(results[key].clientId,results[key].traderId);
 
               if(ctx.state.trader==results[key].clientId){
+
                 results[key].role="buyer"
             }
             else{
@@ -632,32 +666,53 @@ async cancelTrade(ctx){
             console.log("here");
             // chain all your queries here. make sure you return them.
             return ctx.db.localTrade.update({
-                  status:'Completed'
+            status:'Completed'
               },{where:{
                 id:ctx.request.body.localTradeId,
                 traderId:ctx.state.trader
-            }}, {transaction: t}).then(function (localTrade) {
+            }}, {transaction: t}).then(function () {
         
                     return ctx.db.localTrade.findOne({
-                      },{where:{
-                        localTradeId:ctx.request.body.localTradeId,
+                      where:{
+                        id:ctx.request.body.localTradeId,
                         traderId:ctx.state.trader,
                         status:'Completed'
-                      }}, {transaction: t})
-                
-              }).then(function (localTrade) {
+                      }}, {transaction: t}).then(function (localTrade) {
               return ctx.db.Wallets.update({
-                field: Sequelize.literal(`balance + ${localTrade.quantity-(localTrade.quantity*0.01)}`)
+                locked: Sequelize.literal(`locked - ${localTrade.quantity}`)
               },{where:{
-                  traderId:localTrade.clientId
-              }}, {transaction: t});
-            }).then(function (localTrade) {
+                  traderId:localTrade.traderId,
+                  supportedTokenId:localTrade.supportedTokenId
+              }}, {transaction: t}).then(function () {
+        
+                return ctx.db.localTrade.findOne({where:{
+                    id:ctx.request.body.localTradeId,
+                    traderId:ctx.state.trader,
+                    status:'Completed'
+                  }}, {transaction: t}).then(function(localTrade){
+                return ctx.db.Wallets.update({
+                    balance: Sequelize.literal(`balance + ${localTrade.quantity-(localTrade.quantity*0.01)}`)
+                  },{where:{
+                      traderId:localTrade.clientId,
+                      supportedTokenId:localTrade.supportedTokenId
+                  }}, {transaction: t}).then(function () {
+        
+                return ctx.db.localTrade.findOne({where:{
+                    id:ctx.request.body.localTradeId,
+                    traderId:ctx.state.trader,
+                    status:'Completed'
+                  }}, {transaction: t}).then(function (localTrade) {
                 return ctx.db.ExchangeWallets.update({
-                  field: Sequelize.literal(`balance + ${localTrade.quantity*0.01}`)
+                  balance: Sequelize.literal(`balance + ${localTrade.quantity*0.01}`)
                 },{where:{
                     supportedTokenId:localTrade.supportedTokenId
                 }}, {transaction: t});
               });
+            });
+        });
+    });
+});
+});
           }).then(function (Wallets) {
               console.log(Wallets);
             ctx.body= { order:{
@@ -714,7 +769,6 @@ async feedback(ctx){
                         message: "you have already given feedback on this trade"
                     }
                 }
-              
             }
             else if(localTrade.status !== "Completed") {
                 return ctx.body = {
@@ -735,17 +789,23 @@ async feedback(ctx){
                   }}, {transaction: t}).then(function(){
 
                     return ctx.db.feedback.create({
-                        rating: ctx.request.body.rating,
+                        rating: String(ctx.request.body.rating),
                         comment:ctx.request.body.comment,
                         localTradeId:ctx.request.body.localTradeId,
                         feedbackClientId:ctx.state.trader,
                         traderId:localTrade.traderId
                          
-                    })
+                    },{transaction:t});
                   }).then(function(feedback){
-
-                      ctx.body=feedback;
+                    ctx.body={
+                        feedback:{
+                        status:1,
+                        message:"Feedback submitted succeffuly",
+                        feedback
+                        }
+                    }
                   }).catch(function(err){
+                      console.log(err)
                     ctx.body={
                         feedback:{
                         status:0,
@@ -771,7 +831,7 @@ async feedback(ctx){
         })
 },
 async getLocaltrades(){
-    console.log("hello");
+
     const dates = await db.localTrade.findAll({
         where:{
             status:"Active"
@@ -832,13 +892,6 @@ async getLocaltrades(){
     });
 },
 
-async sendSellRequest(){
-
-
-    
-},
-
-
 async getTradeDetails(ctx){
 
 
@@ -849,10 +902,48 @@ async getTradeDetails(ctx){
         },
         raw:true
         })
+
+            if(ctx.state.trader==tradedetails.clientId){
+                tradedetails.role="buyer"
+            }
+            else {
+             
+                tradedetails.role="seller"
+                  
+            }
+
+        console.log("trade details with roles",tradedetails)
         let time = Date.parse(tradedetails.createdAt)+10800000;
         tradedetails.deadline = time;
+     
         console.log(tradedetails);
     ctx.body =  tradedetails;
+},
+async pastTrades (ctx){
+    try{
+        await ctx.db.sequelize.query('select "localTrades"."id","localTrades"."status","localTrades"."feedbackGiven", "localTrades"."clientId","localTrades"."traderId","supportedTokens"."name"  from "localTrades" \
+        join "supportedTokens" on "localTrades"."supportedTokenId" = "supportedTokens"."id" \
+        where ("localTrades"."clientId" = :traderId OR "localTrades"."traderId" = :traderId)' ,{replacements:{
+        traderId:ctx.state.trader,
+        }}).spread((results, metadata) => {
+            for (let key in results){
+                console.log(results[key].clientId,results[key].traderId);
+
+              if(ctx.state.trader==results[key].clientId){
+
+                results[key].role="buyer"
+            }
+            else{
+              results[key].role="seller"
+            }
+            }
+            ctx.body= results;
+      });
+    }catch(err){
+        console.log(err);
+
+    }
+
 }
 };
 

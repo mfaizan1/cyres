@@ -9,6 +9,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   tradingpairs.associate = function(models) {
     tradingpairs.hasMany(models.orders);
+    tradingpairs.hasMany(models.prices);
+    tradingpairs.hasMany(models.candlestick);
   };
   return tradingpairs;
 };

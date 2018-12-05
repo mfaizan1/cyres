@@ -6,9 +6,8 @@ const Sequelize = require('sequelize');
 Consumer = kafka.Consumer,
 client = new kafka.Client(),
 consumer = new Consumer(client,
-    [{ topic: 'address.created'},{topic:"transaction"}],
+    [{ topic: 'address.created'},{ topic: 'btc.address.created'},{topic:"transaction"}],
     {
-   
         autoCommit: true
     }
 );
@@ -18,6 +17,10 @@ if(message.topic=="transaction"){
     module.exports.transaction(message.value);
 }else if (message.topic=="address.created"){
     module.exports.updateAddress(message.value);
+}
+else if (message.topic=="btc.address.created"){
+    module.exports.updateAddress(message.value);
+    // console.log(message.value)
 }
 });
 
@@ -52,8 +55,8 @@ async transaction(data){
         address:parsedData.to
     }});
     console.log("adddetails",addressDetails);
-    if(addressDetails){
-        console.log("fuck :') ");
+    if(addressDetails!=null){
+
         return db.sequelize.transaction(function (t) {
             return db.Wallets.findOne({where:{
                 traderId:addressDetails.traderId,
@@ -89,17 +92,42 @@ async transaction(data){
     }
 
 },
-
-
+async updatebalance(ctx){
+ try{
+   await ctx.db.Wallets.update({
+        balance: Sequelize.literal(`balance + ${ctx.request.body.value}`)
+      },{where:{
+          traderId:ctx.state.trader,
+          supportedTokenId:1
+      }});
+   const wallet =await ctx.db.Wallets.findOne({
+        attributes:['address','balance'],
+        where:{
+            supportedTokenId:coin.id,
+            traderId:ctx.state.trader
+        }
+    });
+ctx.body = {
+    addressavailable: {
+        "status": 1,
+        "address": wallet.address,
+        "balance":wallet.balance
+    }
+}
+}catch(err){
+console.log(err)
+}
+}
+,
 async updateAddress(data){
+    console.log("update address")
     var parsedData = JSON.parse(data);
-   
     var already_exist = await db.addresses.findOne({where:{
         traderId:parsedData.userId,
         supportedTokenId:parsedData.coinId,
-        new:true
     }});
 if (already_exist){
+    console.log("address already exists")
     return db.sequelize.transaction(function (t) {
         // chain all your queries here. make sure you return them.
         return db.addresses.update({
@@ -113,9 +141,18 @@ if (already_exist){
           return db.addresses.create({
               address:parsedData.address,
               traderId:parsedData.userId,
-              supportedTokenId:parsedData.coinId,
-              new:true
-          }, {transaction: t})
+              supportedTokenId:parsedData.coinId
+          }, {transaction: t}).then(function(address){
+            return db.Wallets.update({
+                address:parsedData.address
+             },
+                {where:{
+                    supportedTokenId: parsedData.coinId,
+                    traderId:parsedData.userId
+                }},{transaction:t});
+            
+
+          })
         });
       }).then(function () {
   
@@ -129,13 +166,32 @@ console.log(err);
 
 }else{
 
-    console.log("parsed data",parsedData);
-    await db.addresses.create({
-        address:parsedData.address,
-        traderId:parsedData.userId,
-        supportedTokenId:parsedData.coinId,
-        new:true
-    });
+    console.log("no previous addresss");
+    return db.sequelize.transaction(function (t) {
+        return db.addresses.create({
+            address:parsedData.address,
+            traderId:parsedData.userId,
+            supportedTokenId:parsedData.coinId,
+            new:true
+        },{transaction:t}).then(function(address){
+             return db.Wallets.update({
+            address:parsedData.address
+         },
+            {where:{
+                supportedTokenId: parsedData.coinId,
+                traderId:parsedData.userId
+            }},{transaction:t});
+        })
+      
+      }).then(function (result) {
+        // Transaction has been committed
+        // result is whatever the result of the promise chain returned to the transaction callback
+      }).catch(function (err) {
+     console.log(err);
+      });
+
+
+    
 }
 
 } ,
@@ -167,31 +223,30 @@ console.log(err)
 }
 
 },async createAddress(ctx){
-
-
+    console.log("creating address")
     try{
         const symbol= ctx.request.body.symbol;
         const coin = await ctx.db.supportedTokens.findOne({
             where:{
                 symbol
-            }, 
-        });
-        console.log(coin);
-        const already_exist= await ctx.db.Wallets.findOne({
-            where:{
-                supportedTokenId:coin.id,
-                traderId:ctx.state.trader
             }
         });
-        if(already_exist.address=="Not assigned"){
-    
+
+        // const already_exist= await ctx.db.Wallets.findOne({
+        //     where:{
+        //         supportedTokenId:coin.id,
+        //         traderId:ctx.state.trader
+        //     }
+        // });
+        // if(already_exist.address=="Not assigned"){
+        
             let meta={
                 "coinId":coin.id,
                 "userId":ctx.state.trader
             };
 
          payloads = [
-         { topic: symbol+".address.create", messages:[JSON.stringify(meta)] , partition: 0 }
+         { topic: symbol.toLowerCase()+".address.create", messages:[JSON.stringify(meta)] , partition: 0 }
                     ];
                    await producer.send(payloads, function (err, data) {
                             // ctx.body=data;
@@ -217,7 +272,7 @@ console.log(err)
     
     
 
-    }
+    // }
 
 
 }catch(err){

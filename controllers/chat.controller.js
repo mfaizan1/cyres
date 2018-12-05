@@ -2,19 +2,80 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const aws = require("./../utils/uploadAws");
 const shortid = require('shortid');
-const chatsocket =  require("./../routes/chatroutes");
 
 module.exports={
+
+
+    async deleteConvo(ctx){
+        try
+   { 
+        const conversation = await ctx.db.conversation.findOne({
+            where:{
+            [Op.or]: [{userOneId: ctx.state.trader},{userTwoId:ctx.state.trader}],
+            id:ctx.request.body.conversationId
+        }
+        });
+        if(conversation.userOneId == ctx.state.trader){
+           const updated= await ctx.db.conversation.update({
+                deletedByUserOne:true
+            },{
+                where :{
+                    id:ctx.request.body.conversationId
+                }
+            });
+
+            if (updated){
+                ctx.body = {deleteConvo:{
+                    status:1,
+                    message:"delete conversation successfully"
+                }}
+            }else {
+                ctx.body = {deleteConvo:{
+                    status:0,
+                    message:"couldn't delete conversation"
+                }}
+            }
+        }else if(conversation.userTwoId == ctx.state.trader) {
+          const updated=  await ctx.db.conversation.update({
+                deletedByUserTwo:true
+            },
+            {
+                where :{
+                    id:ctx.request.body.conversationId
+                }
+            });
+        
+            if (updated){
+                ctx.body = {deleteConvo:{
+                    status:1,
+                    message:"delete conversation successfully"
+                }}
+            }else {
+                ctx.body = {deleteConvo:{
+                    status:0,
+                    message:"couldn't delete conversation"
+                }}
+            }
+        }
+    }catch(err){
+console.log(err)
+ctx.body = {deleteConvo:{
+    status:0,
+    message:"couldn't delete conversation"
+}}
+}
+    },
     async sendImage(ctx){
         try{
           let {body, files} = ctx.request;
             if(files.file.type == 'image/jpg' ||files.file.type == 'image/png' || files.file.type == 'image/jpeg'  ){
-            const { key, url }    = await  aws.uploadFile({
+           
+                const {key,url} = await  aws.uploadFile({
               filePath:files.file.path,
               fileType:files.file.type,
               key:`conversations/${body.conversationId}/${shortid.generate()}`
           });
-          console.log(key,url);
+   
             if (key==0 && url == 0){
                 return   ctx.body={imagesend:{
                     status:0,
@@ -24,6 +85,7 @@ module.exports={
                 }
                 
             }else{
+                console.log(body);
                  const conversation = await ctx.db.conversation.findOne({where:{
         id : ctx.request.body.conversationId
     }});
@@ -98,21 +160,19 @@ module.exports={
       }
       ,
 async findConversations(ctx){
-    console.log("trader"+ctx.state.trader)
     const conToSearch = [];
     const conToSend=[];
         const conversations = await ctx.db.conversation.findAll({
-
             where:{
             [Op.or]: [{userOneId: ctx.state.trader},{userTwoId:ctx.state.trader}]
         }
         });
     for (var key in conversations) {
         if (conversations.hasOwnProperty(key)) {
-           if(conversations[key].userOneId == ctx.state.trader){
+           if(conversations[key].userOneId == ctx.state.trader && conversations[key].deletedByUserOne == false ){
             // conToSearch.push(conversations[key].userTwoId );
             conToSearch.push({user:conversations[key].userTwoId , conversationId:conversations[key].id})
-           }else if (conversations[key].userTwoId == ctx.state.trader){
+           }else if (conversations[key].userTwoId == ctx.state.trader  && conversations[key].deletedByUserTwo == false){
                 // conToSearch.push(conversations[key].userOneId);
                 conToSearch.push({user:conversations[key].userOneId , conversationId:conversations[key].id})
 

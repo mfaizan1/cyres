@@ -1,10 +1,15 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var conversation = sequelize.define('conversation', {
-    deleted:{
+    deletedByUserOne:{
       type:DataTypes.BOOLEAN,
       defaultValue:false
-    }
+    },
+    deletedByUserTwo:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false  
+    },
+
   }, {});
   conversation.associate = function(models) {
 

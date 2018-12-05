@@ -29,7 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     delete:{
       type:DataTypes.BOOLEAN,
-      defaultValue:false
+      defaultValue:false,
+      unique:"compositeIndex"
     }
   }, {});
   coinsToTrade.associate = function(models) {

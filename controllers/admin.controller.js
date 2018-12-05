@@ -235,19 +235,15 @@ module.exports={
     },
     async allApplications(ctx){
 
-        ctx.body=  await ctx.db.verificationApplication.findAll({
-            where:{
-                status:"Review Pending"
-            }
-        });
+        ctx.body=  await ctx.db.verificationApplication.findAll();
     },
-    async application(ctx){
+    // async application(ctx){
 
-        await ctx.db.sequelize.query('select * from "verificationApplications" join "applicationPictures" on "verificationApplications"."id" = "applicationPictures"."verificationApplicationId" where "verificationApplications"."id" = :id',{replacements:{
-            id:ctx.request.body.applicationId
-        },type:ctx.db.sequelize.QueryTypes.SELECT}).then(applicationdata=>{
-            ctx.body=applicationdata;
-        });
+    //     await ctx.db.sequelize.query('select * from "verificationApplications" join "applicationPictures" on "verificationApplications"."id" = "applicationPictures"."verificationApplicationId" where "verificationApplications"."id" = :id',{replacements:{
+    //         id:ctx.request.body.applicationId
+    //     },type:ctx.db.sequelize.QueryTypes.SELECT}).then(applicationdata=>{
+    //         ctx.body=applicationdata;
+    //     });
 
 
         // ctx.body =  await ctx.db.verificationApplication.findOne({
@@ -255,7 +251,7 @@ module.exports={
         //         id:ctx.request.body.applicationId
         //     }
         // })
-    },
+    // },
     async approveApplication(ctx){
 
         try{

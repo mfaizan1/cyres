@@ -5,7 +5,6 @@ module.exports = (sequelize, DataTypes) => {
     country: DataTypes.STRING,
     stateOrProvince: DataTypes.STRING,
     city: DataTypes.STRING,
-    cardNumber: DataTypes.STRING,
     status: {
       type:DataTypes.STRING,
       defaultValue:"Review Pending"
@@ -17,10 +16,16 @@ module.exports = (sequelize, DataTypes) => {
     traderId:{
       type: DataTypes.INTEGER,
       unique:true
-    }
+    },
+    status:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:false
+    },
+    phonenumber: DataTypes.STRING,
+    code: DataTypes.INTEGER
   }, {});
-    verificationApplication.associate = function(models) {
-    verificationApplication.hasMany(models.applicationPictures)
+  verificationApplication.associate = function(models) {
+    // associations can be defined here
   };
   return verificationApplication;
 };
